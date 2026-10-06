@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>About QuickTools</title>
+<meta name="description" content="Learn about QuickTools, a collection of useful free online tools and calculators.">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:Arial,sans-serif;background:#f5f7fb;color:#172033;line-height:1.7}
+header{background:#111827;color:white;padding:22px 6%;display:flex;justify-content:space-between;align-items:center}
+.logo{font-size:24px;font-weight:800;color:#8b5cf6}
+nav a{color:white;text-decoration:none;margin-left:18px;font-size:14px}
+main{max-width:900px;margin:40px auto;padding:0 20px}
+.card{background:white;padding:40px;border-radius:20px;box-shadow:0 8px 30px rgba(0,0,0,.06)}
+h1{font-size:38px;margin-bottom:15px}
+h2{margin-top:30px;color:#4f46e5}
+p{font-size:16px;margin-top:10px}
+.features{display:grid;grid-template-columns:repeat(2,1fr);gap:15px;margin-top:25px}
+.feature{background:#f8f7ff;padding:20px;border-radius:14px}
+.feature strong{display:block;margin-bottom:5px}
+footer{text-align:center;padding:30px;color:#667085}
+a{color:#4f46e5}
+@media(max-width:600px){
+.features{grid-template-columns:1fr}
+.card{padding:25px}
+h1{font-size:30px}
+nav a{margin-left:8px;font-size:12px}
+}
+</style>
+</head>
+<body>
+
+<header>
+<div class="logo">QuickTools</div>
+<nav>
+<a href="index.html">Home</a>
+<a href="Privacy.html">Privacy</a>
+<a href="Contact.html">Contact</a>
+</nav>
+</header>
+
+<main>
+<div class="card">
+
+<h1>About QuickTools</h1>
+
+<p>QuickTools is an online collection of simple, useful tools designed to help people complete everyday calculations and digital tasks quickly.</p>
+
+<h2>Our Mission</h2>
+
+<p>Our goal is simple: make useful online tools easy to find, easy to understand and easy to use from a phone, tablet or computer.</p>
+
+<div class="features">
+
+<div class="feature">
+<strong>⚡ Fast</strong>
+<p>Tools are designed to work quickly without unnecessary steps.</p>
+</div>
+
+<div class="feature">
+<strong>📱 Mobile Friendly</strong>
+<p>QuickTools is designed to work comfortably on smartphones and tablets.</p>
+</div>
+
+<div class="feature">
+<strong>🧮 Useful Tools</strong>
+<p>Calculators, converters, text utilities and other everyday tools in one place.</p>
+</div>
+
+<div class="feature">
+<strong>🌍 Built for Everyone</strong>
+<p>QuickTools is designed for people around the world and can be accessed from anywhere with an internet connection.</p>
+</div>
+
+</div>
+
+<h2>What You Can Do</h2>
+
+<p>Depending on the tools currently available, visitors can perform calculations, convert units, analyze text, generate passwords, calculate dates and use other productivity utilities.</p>
+
+<h2>Our Approach</h2>
+
+<p>We focus on keeping the website simple, responsive and useful. We continue to improve existing tools and add new utilities based on everyday needs.</p>
+
+<h2>Contact Us</h2>
+
+<p>If you have a suggestion, discover a problem or want to contact QuickTools, visit our <a href="Contact.html">Contact page</a>.</p>
+
+</div>
+</main>
+
+<footer>
+© 2026 QuickTools. All rights reserved.
+</footer>
+
+</body>
+</html>
