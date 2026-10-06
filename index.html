@@ -5,180 +5,568 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
   <title>QuickTools - Free Online Tools</title>
-  <meta name="description" content="QuickTools provides fast, simple and free online tools for everyday tasks.">
+  <meta name="description" content="QuickTools provides free, fast and useful online calculators, converters, text tools, password tools and more.">
+  <meta name="keywords" content="online tools, calculator, percentage calculator, age calculator, password generator, text counter, unit converter">
+  <meta name="robots" content="index, follow">
+
+  <meta property="og:title" content="QuickTools - Free Online Tools">
+  <meta property="og:description" content="Fast and useful free online tools.">
+  <meta property="og:type" content="website">
+
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>⚡</text></svg>">
+
+  <!-- Supabase -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
   <style>
+    :root {
+      --bg: #f5f7fb;
+      --card: #ffffff;
+      --text: #111827;
+      --muted: #667085;
+      --border: #e5e7eb;
+      --primary: #635bff;
+      --primary-dark: #5048d8;
+      --success: #16a34a;
+      --danger: #dc2626;
+      --header: rgba(255,255,255,.92);
+      --shadow: 0 10px 30px rgba(15,23,42,.08);
+    }
+
+    body.dark {
+      --bg: #0b1120;
+      --card: #111827;
+      --text: #f8fafc;
+      --muted: #94a3b8;
+      --border: #263244;
+      --header: rgba(11,17,32,.94);
+      --shadow: 0 10px 30px rgba(0,0,0,.25);
+    }
+
     * {
       box-sizing: border-box;
       margin: 0;
       padding: 0;
     }
 
-    body {
-      font-family: Arial, sans-serif;
-      background: #f5f7fb;
-      color: #111827;
-      min-height: 100vh;
+    html {
+      scroll-behavior: smooth;
     }
 
+    body {
+      font-family:
+        Inter, Arial, Helvetica, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.5;
+      transition: background .2s, color .2s;
+    }
+
+    button,
+    input,
+    textarea,
+    select {
+      font: inherit;
+    }
+
+    button {
+      cursor: pointer;
+    }
+
+    a {
+      color: inherit;
+      text-decoration: none;
+    }
+
+    .container {
+      width: min(1120px, calc(100% - 30px));
+      margin: auto;
+    }
+
+    /* HEADER */
+
     header {
-      background: #111827;
-      color: white;
-      padding: 18px 20px;
       position: sticky;
       top: 0;
       z-index: 100;
+      background: var(--header);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--border);
     }
 
     .nav {
-      max-width: 1100px;
-      margin: auto;
+      min-height: 68px;
       display: flex;
-      justify-content: space-between;
       align-items: center;
+      justify-content: space-between;
+      gap: 15px;
     }
 
     .logo {
-      font-size: 24px;
-      font-weight: bold;
+      display: flex;
+      align-items: center;
+      gap: 9px;
+      font-size: 22px;
+      font-weight: 800;
+      letter-spacing: -.5px;
     }
 
-    .settings-btn {
-      border: none;
-      background: #374151;
+    .logo-icon {
+      width: 38px;
+      height: 38px;
+      display: grid;
+      place-items: center;
+      border-radius: 11px;
+      background: linear-gradient(135deg,#635bff,#8b5cf6);
       color: white;
-      padding: 9px 14px;
-      border-radius: 8px;
-      cursor: pointer;
     }
+
+    .nav-actions {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .icon-btn,
+    .login-btn {
+      border: 1px solid var(--border);
+      background: var(--card);
+      color: var(--text);
+      padding: 9px 13px;
+      border-radius: 10px;
+    }
+
+    .login-btn {
+      background: var(--primary);
+      color: white;
+      border-color: var(--primary);
+      font-weight: 700;
+    }
+
+    .login-btn:hover {
+      background: var(--primary-dark);
+    }
+
+    /* HERO */
 
     .hero {
+      padding: 70px 0 45px;
       text-align: center;
-      padding: 55px 20px 35px;
+    }
+
+    .badge {
+      display: inline-block;
+      padding: 7px 13px;
+      border-radius: 999px;
+      background: rgba(99,91,255,.1);
+      color: var(--primary);
+      font-size: 13px;
+      font-weight: 700;
+      margin-bottom: 18px;
     }
 
     .hero h1 {
-      font-size: 38px;
-      margin-bottom: 12px;
+      font-size: clamp(35px,7vw,62px);
+      line-height: 1.05;
+      letter-spacing: -2px;
+      max-width: 800px;
+      margin: auto;
+    }
+
+    .hero h1 span {
+      color: var(--primary);
     }
 
     .hero p {
-      color: #6b7280;
-      font-size: 17px;
+      color: var(--muted);
+      max-width: 650px;
+      margin: 18px auto 0;
+      font-size: 18px;
     }
 
-    .tools {
-      max-width: 1100px;
-      margin: auto;
-      padding: 20px;
+    .search-box {
+      max-width: 600px;
+      margin: 28px auto 0;
+      position: relative;
+    }
+
+    .search-box input {
+      width: 100%;
+      padding: 16px 18px;
+      border-radius: 14px;
+      border: 1px solid var(--border);
+      background: var(--card);
+      color: var(--text);
+      outline: none;
+      box-shadow: var(--shadow);
+    }
+
+    .search-box input:focus {
+      border-color: var(--primary);
+    }
+
+    /* TOOLS */
+
+    .section-title {
+      text-align: center;
+      margin: 25px 0;
+    }
+
+    .section-title h2 {
+      font-size: 28px;
+    }
+
+    .section-title p {
+      color: var(--muted);
+      margin-top: 6px;
+    }
+
+    .tools-grid {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-      gap: 18px;
+      grid-template-columns: repeat(4,1fr);
+      gap: 16px;
     }
 
     .tool-card {
-      background: white;
-      border-radius: 14px;
-      padding: 25px;
-      box-shadow: 0 5px 20px rgba(0,0,0,0.06);
-      cursor: pointer;
-      transition: 0.2s;
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 17px;
+      padding: 22px;
+      box-shadow: var(--shadow);
+      transition: transform .2s, border .2s;
     }
 
     .tool-card:hover {
       transform: translateY(-4px);
+      border-color: rgba(99,91,255,.5);
     }
 
     .tool-icon {
-      font-size: 32px;
-      margin-bottom: 12px;
+      width: 48px;
+      height: 48px;
+      border-radius: 13px;
+      display: grid;
+      place-items: center;
+      background: rgba(99,91,255,.1);
+      font-size: 24px;
+      margin-bottom: 15px;
     }
 
-    .tool-card h2 {
-      font-size: 19px;
-      margin-bottom: 8px;
+    .tool-card h3 {
+      font-size: 18px;
+      margin-bottom: 7px;
     }
 
     .tool-card p {
-      color: #6b7280;
-      line-height: 1.5;
+      color: var(--muted);
+      font-size: 14px;
     }
+
+    .tool-card button {
+      width: 100%;
+      margin-top: 16px;
+      border: 0;
+      background: var(--primary);
+      color: white;
+      padding: 11px;
+      border-radius: 10px;
+      font-weight: 700;
+    }
+
+    /* FEATURES */
+
+    .features {
+      display: grid;
+      grid-template-columns: repeat(3,1fr);
+      gap: 18px;
+      margin: 65px 0;
+    }
+
+    .feature {
+      text-align: center;
+      padding: 25px;
+    }
+
+    .feature-icon {
+      font-size: 32px;
+      margin-bottom: 10px;
+    }
+
+    .feature p {
+      color: var(--muted);
+      margin-top: 7px;
+    }
+
+    /* FOOTER */
 
     footer {
-      text-align: center;
-      padding: 40px 20px;
-      color: #6b7280;
+      margin-top: 60px;
+      border-top: 1px solid var(--border);
+      padding: 35px 0;
+      color: var(--muted);
     }
 
-    /* Settings */
+    .footer-inner {
+      display: flex;
+      justify-content: space-between;
+      gap: 20px;
+      flex-wrap: wrap;
+    }
 
-    .settings-panel {
+    .footer-links {
+      display: flex;
+      gap: 18px;
+      flex-wrap: wrap;
+    }
+
+    .footer-links a:hover {
+      color: var(--primary);
+    }
+
+    /* MODALS */
+
+    .modal {
       display: none;
       position: fixed;
       inset: 0;
-      background: rgba(0,0,0,0.5);
-      z-index: 200;
+      z-index: 500;
+      background: rgba(0,0,0,.6);
       padding: 20px;
+      overflow-y: auto;
     }
 
-    .settings-box {
-      background: white;
-      max-width: 450px;
-      margin: 60px auto;
+    .modal.show {
+      display: block;
+    }
+
+    .modal-box {
+      width: min(500px,100%);
+      margin: 50px auto;
+      background: var(--card);
+      color: var(--text);
+      border-radius: 18px;
       padding: 25px;
-      border-radius: 16px;
+      box-shadow: 0 25px 70px rgba(0,0,0,.3);
+      position: relative;
     }
 
-    .settings-box h2 {
+    .modal-header {
+      display: flex;
+      justify-content: space-between;
+      gap: 15px;
       margin-bottom: 20px;
     }
 
-    .setting {
-      padding: 15px 0;
-      border-bottom: 1px solid #eee;
+    .close {
+      border: 0;
+      background: transparent;
+      color: var(--muted);
+      font-size: 23px;
     }
 
-    .close-btn {
-      float: right;
-      border: none;
-      background: #eee;
-      padding: 7px 11px;
-      border-radius: 7px;
-      cursor: pointer;
+    .form-group {
+      margin-bottom: 15px;
     }
 
-    /* Dark mode */
+    .form-group label {
+      display: block;
+      font-size: 14px;
+      font-weight: 700;
+      margin-bottom: 6px;
+    }
 
-    body.dark {
-      background: #0f172a;
+    .form-group input,
+    .form-group textarea,
+    .form-group select {
+      width: 100%;
+      padding: 12px;
+      border-radius: 10px;
+      border: 1px solid var(--border);
+      background: var(--bg);
+      color: var(--text);
+      outline: none;
+    }
+
+    .primary-btn {
+      width: 100%;
+      border: 0;
+      background: var(--primary);
       color: white;
+      padding: 13px;
+      border-radius: 10px;
+      font-weight: 800;
     }
 
-    body.dark .tool-card,
-    body.dark .settings-box {
-      background: #1e293b;
+    .secondary-btn {
+      border: 1px solid var(--border);
+      background: var(--card);
+      color: var(--text);
+      padding: 10px 14px;
+      border-radius: 9px;
     }
 
-    body.dark .tool-card p,
-    body.dark .hero p {
-      color: #cbd5e1;
-    }
-
-    body.dark .setting {
-      border-color: #334155;
-    }
-
-    body.dark .close-btn {
-      background: #334155;
+    .danger-btn {
+      border: 0;
+      background: var(--danger);
       color: white;
+      padding: 11px 15px;
+      border-radius: 9px;
+      font-weight: 700;
     }
 
-    @media (max-width: 600px) {
-      .hero h1 {
-        font-size: 30px;
+    .form-message {
+      margin-top: 12px;
+      font-size: 14px;
+      color: var(--muted);
+    }
+
+    .switch {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 14px 0;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .switch input {
+      width: 20px;
+      height: 20px;
+    }
+
+    .account-card {
+      padding: 16px;
+      background: var(--bg);
+      border-radius: 12px;
+      margin-bottom: 15px;
+    }
+
+    /* TOOL WORKSPACE */
+
+    .workspace {
+      display: none;
+    }
+
+    .workspace.show {
+      display: block;
+    }
+
+    .workspace-box {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 18px;
+      padding: 25px;
+      box-shadow: var(--shadow);
+    }
+
+    .workspace-top {
+      display: flex;
+      justify-content: space-between;
+      gap: 15px;
+      align-items: center;
+      margin-bottom: 20px;
+    }
+
+    .workspace-content {
+      max-width: 700px;
+      margin: auto;
+    }
+
+    .result {
+      margin-top: 18px;
+      padding: 16px;
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      white-space: pre-wrap;
+      word-break: break-word;
+    }
+
+    .two-columns {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+    }
+
+    .copy-btn {
+      margin-top: 10px;
+    }
+
+    /* STATIC PAGES */
+
+    .content-page {
+      display: none;
+      padding: 45px 0;
+    }
+
+    .content-page.show {
+      display: block;
+    }
+
+    .content-box {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 18px;
+      padding: 28px;
+      box-shadow: var(--shadow);
+    }
+
+    .content-box h1 {
+      margin-bottom: 18px;
+    }
+
+    .content-box h2 {
+      margin: 25px 0 8px;
+    }
+
+    .content-box p {
+      color: var(--muted);
+      margin-bottom: 12px;
+    }
+
+    /* RESPONSIVE */
+
+    @media(max-width:900px) {
+      .tools-grid {
+        grid-template-columns: repeat(2,1fr);
+      }
+    }
+
+    @media(max-width:600px) {
+      .container {
+        width: min(100% - 20px,1120px);
       }
 
-      .tools {
+      .nav {
+        min-height: 60px;
+      }
+
+      .logo {
+        font-size: 18px;
+      }
+
+      .logo-icon {
+        width: 34px;
+        height: 34px;
+      }
+
+      .login-btn {
+        display: none;
+      }
+
+      .hero {
+        padding: 45px 0 30px;
+      }
+
+      .hero h1 {
+        letter-spacing: -1px;
+      }
+
+      .tools-grid,
+      .features {
+        grid-template-columns: 1fr;
+      }
+
+      .two-columns {
         grid-template-columns: 1fr;
       }
     }
@@ -187,215 +575,1727 @@
 
 <body>
 
-  <header>
-    <div class="nav">
-      <div class="logo">⚡ QuickTools</div>
+<header>
+  <div class="container nav">
 
-      <button class="settings-btn" onclick="openSettings()">
-        ⚙️ Settings
+    <a href="#" class="logo" onclick="showHome(); return false;">
+      <span class="logo-icon">⚡</span>
+      QuickTools
+    </a>
+
+    <div class="nav-actions">
+      <button class="icon-btn" onclick="toggleDarkMode()" title="Toggle theme">
+        🌙
+      </button>
+
+      <button class="icon-btn" onclick="openSettings()">
+        ⚙️
+      </button>
+
+      <button class="login-btn" id="authButton" onclick="openAuth()">
+        Login
       </button>
     </div>
-  </header>
 
-  <main>
+  </div>
+</header>
+
+<main>
+
+  <!-- HOME -->
+
+  <div id="homePage">
 
     <section class="hero">
-      <h1>Free Online Tools</h1>
-      <p>Simple, fast and useful tools for everyday tasks.</p>
+      <div class="container">
+
+        <div class="badge">⚡ Fast • Free • Simple</div>
+
+        <h1>
+          Useful tools,
+          <span>made simple.</span>
+        </h1>
+
+        <p>
+          Calculate, convert, generate and manage everyday tasks
+          with QuickTools.
+        </p>
+
+        <div class="search-box">
+          <input
+            type="search"
+            id="toolSearch"
+            placeholder="Search for a tool..."
+            oninput="searchTools()"
+          >
+        </div>
+
+      </div>
     </section>
 
-    <section class="tools">
+    <section class="container">
 
-      <div class="tool-card" onclick="calculator()">
-        <div class="tool-icon">🧮</div>
-        <h2>Calculator</h2>
-        <p>Perform basic calculations quickly.</p>
+      <div class="section-title">
+        <h2>Popular Tools</h2>
+        <p>Everything you need in one place.</p>
       </div>
 
-      <div class="tool-card" onclick="percentage()">
-        <div class="tool-icon">📊</div>
-        <h2>Percentage Calculator</h2>
-        <p>Calculate percentages easily.</p>
-      </div>
+      <div class="tools-grid" id="toolsGrid">
 
-      <div class="tool-card" onclick="ageCalculator()">
-        <div class="tool-icon">🎂</div>
-        <h2>Age Calculator</h2>
-        <p>Calculate someone's age.</p>
-      </div>
+        <!-- Calculator -->
 
-      <div class="tool-card" onclick="textCounter()">
-        <div class="tool-icon">📝</div>
-        <h2>Text Counter</h2>
-        <p>Count words and characters.</p>
-      </div>
+        <div class="tool-card" data-name="calculator">
+          <div class="tool-icon">🧮</div>
+          <h3>Calculator</h3>
+          <p>Perform everyday mathematical calculations.</p>
+          <button onclick="openTool('calculator')">Open Tool</button>
+        </div>
 
-      <div class="tool-card" onclick="passwordGenerator()">
-        <div class="tool-icon">🔐</div>
-        <h2>Password Generator</h2>
-        <p>Create strong random passwords.</p>
-      </div>
+        <!-- Percentage -->
 
-      <div class="tool-card" onclick="numberChecker()">
-        <div class="tool-icon">🔢</div>
-        <h2>Number Checker</h2>
-        <p>Check whether a number is even or odd.</p>
+        <div class="tool-card" data-name="percentage percentage calculator">
+          <div class="tool-icon">📊</div>
+          <h3>Percentage Calculator</h3>
+          <p>Calculate percentages quickly and accurately.</p>
+          <button onclick="openTool('percentage')">Open Tool</button>
+        </div>
+
+        <!-- Age -->
+
+        <div class="tool-card" data-name="age age calculator">
+          <div class="tool-icon">🎂</div>
+          <h3>Age Calculator</h3>
+          <p>Calculate age from a date of birth.</p>
+          <button onclick="openTool('age')">Open Tool</button>
+        </div>
+
+        <!-- Password -->
+
+        <div class="tool-card" data-name="password password generator">
+          <div class="tool-icon">🔐</div>
+          <h3>Password Generator</h3>
+          <p>Create strong random passwords.</p>
+          <button onclick="openTool('password')">Open Tool</button>
+        </div>
+
+        <!-- Text -->
+
+        <div class="tool-card" data-name="text text counter word counter">
+          <div class="tool-icon">📝</div>
+          <h3>Text Counter</h3>
+          <p>Count characters, words and lines.</p>
+          <button onclick="openTool('text')">Open Tool</button>
+        </div>
+
+        <!-- Number -->
+
+        <div class="tool-card" data-name="number even odd checker">
+          <div class="tool-icon">🔢</div>
+          <h3>Number Checker</h3>
+          <p>Check whether a number is even or odd.</p>
+          <button onclick="openTool('number')">Open Tool</button>
+        </div>
+
+        <!-- Unit -->
+
+        <div class="tool-card" data-name="unit converter conversion">
+          <div class="tool-icon">📏</div>
+          <h3>Unit Converter</h3>
+          <p>Convert common units quickly.</p>
+          <button onclick="openTool('unit')">Open Tool</button>
+        </div>
+
+        <!-- Currency -->
+
+        <div class="tool-card" data-name="currency calculator">
+          <div class="tool-icon">💰</div>
+          <h3>Currency Calculator</h3>
+          <p>Calculate currency using your exchange rate.</p>
+          <button onclick="openTool('currency')">Open Tool</button>
+        </div>
+
       </div>
 
     </section>
 
-  </main>
+    <section class="container">
 
-  <footer>
-    © 2026 QuickTools. All rights reserved.
-  </footer>
+      <div class="features">
 
-  <!-- Settings -->
+        <div class="feature">
+          <div class="feature-icon">⚡</div>
+          <h3>Fast</h3>
+          <p>Tools load quickly and work directly in your browser.</p>
+        </div>
 
-  <div class="settings-panel" id="settingsPanel">
+        <div class="feature">
+          <div class="feature-icon">📱</div>
+          <h3>Mobile Friendly</h3>
+          <p>Designed to work comfortably on phones and computers.</p>
+        </div>
 
-    <div class="settings-box">
+        <div class="feature">
+          <div class="feature-icon">🔒</div>
+          <h3>Privacy Friendly</h3>
+          <p>Most calculations happen directly on your device.</p>
+        </div>
 
-      <button class="close-btn" onclick="closeSettings()">✕</button>
+      </div>
 
-      <h2>Settings</h2>
+    </section>
 
-      <div class="setting">
-        <strong>Dark Mode</strong>
-        <br><br>
-        <button onclick="toggleDarkMode()">
-          Toggle Dark Mode
+  </div>
+
+  <!-- TOOL WORKSPACE -->
+
+  <section class="container workspace" id="workspace">
+
+    <div class="workspace-box">
+
+      <div class="workspace-top">
+        <h2 id="workspaceTitle">Tool</h2>
+
+        <button class="secondary-btn" onclick="closeTool()">
+          ← Back
         </button>
       </div>
 
-      <div class="setting">
-        <strong>Website</strong>
-        <br><br>
-        QuickTools
-      </div>
+      <div class="workspace-content" id="workspaceContent"></div>
 
-      <div class="setting">
-        <strong>Version</strong>
-        <br><br>
-        1.0
+    </div>
+
+  </section>
+
+  <!-- ABOUT -->
+
+  <section class="content-page" id="aboutPage">
+    <div class="container">
+      <div class="content-box">
+
+        <h1>About QuickTools</h1>
+
+        <p>
+          QuickTools is a free online tools platform designed to make
+          everyday digital tasks easier.
+        </p>
+
+        <h2>Our goal</h2>
+
+        <p>
+          We want to provide simple, fast and accessible tools that
+          anyone can use from a phone, tablet or computer.
+        </p>
+
+        <h2>Free to use</h2>
+
+        <p>
+          QuickTools is designed to provide useful tools without
+          requiring a complicated installation.
+        </p>
+
       </div>
+    </div>
+  </section>
+
+  <!-- PRIVACY -->
+
+  <section class="content-page" id="privacyPage">
+    <div class="container">
+      <div class="content-box">
+
+        <h1>Privacy Policy</h1>
+
+        <p>
+          QuickTools respects your privacy.
+        </p>
+
+        <h2>Information</h2>
+
+        <p>
+          Some features may require an account. Account information
+          may be stored securely through our authentication provider.
+        </p>
+
+        <h2>Tools</h2>
+
+        <p>
+          Most calculations and conversions are processed directly
+          in your browser.
+        </p>
+
+        <h2>Cookies and storage</h2>
+
+        <p>
+          Your browser may store settings such as your preferred theme.
+        </p>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- TERMS -->
+
+  <section class="content-page" id="termsPage">
+    <div class="container">
+      <div class="content-box">
+
+        <h1>Terms of Use</h1>
+
+        <p>
+          By using QuickTools, you agree to use the website responsibly.
+        </p>
+
+        <h2>Accuracy</h2>
+
+        <p>
+          QuickTools provides general-purpose tools. Always verify
+          important calculations independently when accuracy is critical.
+        </p>
+
+        <h2>Availability</h2>
+
+        <p>
+          We may improve, change or temporarily disable features
+          when necessary.
+        </p>
+
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<footer>
+
+  <div class="container footer-inner">
+
+    <div>
+      © 2026 QuickTools
+    </div>
+
+    <div class="footer-links">
+
+      <a href="#" onclick="showHome();return false;">
+        Home
+      </a>
+
+      <a href="#" onclick="showPage('aboutPage');return false;">
+        About
+      </a>
+
+      <a href="#" onclick="showPage('privacyPage');return false;">
+        Privacy
+      </a>
+
+      <a href="#" onclick="showPage('termsPage');return false;">
+        Terms
+      </a>
+
+      <a href="Admin.html">
+        Admin
+      </a>
 
     </div>
 
   </div>
 
-  <script>
+</footer>
 
-    function openSettings() {
-      document.getElementById("settingsPanel").style.display = "block";
+<!-- AUTH MODAL -->
+
+<div class="modal" id="authModal">
+
+  <div class="modal-box">
+
+    <div class="modal-header">
+      <div>
+        <h2 id="authTitle">Login</h2>
+        <p id="authSubtitle">Sign in to your QuickTools account.</p>
+      </div>
+
+      <button class="close" onclick="closeModal('authModal')">
+        ×
+      </button>
+    </div>
+
+    <form id="authForm">
+
+      <div class="form-group">
+        <label>Email</label>
+        <input
+          type="email"
+          id="authEmail"
+          placeholder="you@example.com"
+          required
+        >
+      </div>
+
+      <div class="form-group">
+        <label>Password</label>
+        <input
+          type="password"
+          id="authPassword"
+          placeholder="Your password"
+          minlength="6"
+          required
+        >
+      </div>
+
+      <div class="form-group" id="confirmPasswordGroup" style="display:none;">
+        <label>Confirm password</label>
+        <input
+          type="password"
+          id="confirmPassword"
+          placeholder="Confirm password"
+          minlength="6"
+        >
+      </div>
+
+      <button class="primary-btn" id="authSubmit">
+        Login
+      </button>
+
+      <div class="form-message" id="authMessage"></div>
+
+    </form>
+
+    <br>
+
+    <button
+      class="secondary-btn"
+      style="width:100%"
+      onclick="toggleAuthMode()"
+      id="authSwitch"
+    >
+      Create an account
+    </button>
+
+  </div>
+
+</div>
+
+<!-- SETTINGS -->
+
+<div class="modal" id="settingsModal">
+
+  <div class="modal-box">
+
+    <div class="modal-header">
+
+      <div>
+        <h2>Settings</h2>
+        <p>Manage your QuickTools preferences.</p>
+      </div>
+
+      <button class="close" onclick="closeModal('settingsModal')">
+        ×
+      </button>
+
+    </div>
+
+    <div class="switch">
+      <div>
+        <strong>Dark Mode</strong>
+        <br>
+        <small>Change the website appearance.</small>
+      </div>
+
+      <input
+        type="checkbox"
+        id="darkToggle"
+        onchange="setDarkMode(this.checked)"
+      >
+    </div>
+
+    <br>
+
+    <div class="account-card">
+
+      <strong>Account</strong>
+
+      <p id="accountStatus">
+        You are not logged in.
+      </p>
+
+      <br>
+
+      <button
+        class="primary-btn"
+        onclick="openAuth(); closeModal('settingsModal')"
+        id="settingsAuthButton"
+      >
+        Login / Register
+      </button>
+
+    </div>
+
+    <div id="loggedInActions" style="display:none;">
+
+      <button
+        class="danger-btn"
+        onclick="logout()"
+      >
+        Logout
+      </button>
+
+    </div>
+
+  </div>
+
+</div>
+
+<script>
+
+  /* =========================================================
+     SUPABASE
+  ========================================================= */
+
+  const SUPABASE_URL =
+    "https://vabrpwyjsowbgzoktxvy.supabase.co";
+
+  const SUPABASE_KEY =
+    "sb_publishable_AJ5Wbwx4q2yAkaaZUl-bvg_dTDNYDbP";
+
+  const supabaseClient =
+    window.supabase.createClient(
+      SUPABASE_URL,
+      SUPABASE_KEY
+    );
+
+
+  /* =========================================================
+     THEME
+  ========================================================= */
+
+  function setDarkMode(enabled) {
+
+    document.body.classList.toggle("dark", enabled);
+
+    localStorage.setItem(
+      "quicktools_dark",
+      enabled ? "true" : "false"
+    );
+
+    const toggle =
+      document.getElementById("darkToggle");
+
+    if (toggle) {
+      toggle.checked = enabled;
+    }
+  }
+
+
+  function toggleDarkMode() {
+
+    const enabled =
+      !document.body.classList.contains("dark");
+
+    setDarkMode(enabled);
+  }
+
+
+  const savedTheme =
+    localStorage.getItem("quicktools_dark");
+
+  setDarkMode(savedTheme === "true");
+
+
+  /* =========================================================
+     MODALS
+  ========================================================= */
+
+  function openModal(id) {
+    document.getElementById(id).classList.add("show");
+  }
+
+
+  function closeModal(id) {
+    document.getElementById(id).classList.remove("show");
+  }
+
+
+  function openSettings() {
+
+    updateAccountUI();
+
+    openModal("settingsModal");
+  }
+
+
+  /* =========================================================
+     AUTH
+  ========================================================= */
+
+  let registerMode = false;
+
+
+  function openAuth() {
+
+    openModal("authModal");
+
+    document.getElementById("authMessage").textContent = "";
+  }
+
+
+  function toggleAuthMode() {
+
+    registerMode = !registerMode;
+
+    const title =
+      document.getElementById("authTitle");
+
+    const subtitle =
+      document.getElementById("authSubtitle");
+
+    const confirmGroup =
+      document.getElementById("confirmPasswordGroup");
+
+    const submit =
+      document.getElementById("authSubmit");
+
+    const switchButton =
+      document.getElementById("authSwitch");
+
+    if (registerMode) {
+
+      title.textContent = "Create account";
+
+      subtitle.textContent =
+        "Create your free QuickTools account.";
+
+      confirmGroup.style.display = "block";
+
+      submit.textContent = "Create Account";
+
+      switchButton.textContent =
+        "Already have an account? Login";
+
+    } else {
+
+      title.textContent = "Login";
+
+      subtitle.textContent =
+        "Sign in to your QuickTools account.";
+
+      confirmGroup.style.display = "none";
+
+      submit.textContent = "Login";
+
+      switchButton.textContent =
+        "Create an account";
     }
 
-    function closeSettings() {
-      document.getElementById("settingsPanel").style.display = "none";
-    }
+    document.getElementById("authMessage").textContent = "";
+  }
 
-    function toggleDarkMode() {
-      document.body.classList.toggle("dark");
 
-      localStorage.setItem(
-        "darkMode",
-        document.body.classList.contains("dark")
-      );
-    }
+  document
+    .getElementById("authForm")
+    .addEventListener("submit", async function(e) {
 
-    if (localStorage.getItem("darkMode") === "true") {
-      document.body.classList.add("dark");
-    }
+      e.preventDefault();
 
-    function calculator() {
-      const value = prompt("Enter calculation, e.g. 25 + 10:");
+      const email =
+        document.getElementById("authEmail").value.trim();
 
-      if (value === null) return;
+      const password =
+        document.getElementById("authPassword").value;
+
+      const message =
+        document.getElementById("authMessage");
+
+      const submit =
+        document.getElementById("authSubmit");
+
+      submit.disabled = true;
+
+      message.textContent = "Please wait...";
 
       try {
-        if (!/^[0-9+*/().% -]+$/.test(value)) {
-          alert("Invalid calculation.");
-          return;
+
+        if (registerMode) {
+
+          const confirmPassword =
+            document.getElementById("confirmPassword").value;
+
+          if (password !== confirmPassword) {
+            throw new Error("Passwords do not match.");
+          }
+
+          const {
+            data,
+            error
+          } = await supabaseClient.auth.signUp({
+
+            email: email,
+
+            password: password,
+
+            options: {
+              emailRedirectTo:
+                window.location.origin +
+                window.location.pathname
+            }
+
+          });
+
+          if (error) throw error;
+
+          message.textContent =
+            "Account created. Check your email to confirm your account before logging in.";
+
+        } else {
+
+          const {
+            data,
+            error
+          } = await supabaseClient.auth.signInWithPassword({
+            email,
+            password
+          });
+
+          if (error) throw error;
+
+          message.textContent =
+            "Login successful.";
+
+          setTimeout(() => {
+            closeModal("authModal");
+          }, 700);
         }
 
-        alert("Result: " + Function("return " + value)());
-      } catch {
-        alert("Please enter a valid calculation.");
+      } catch (error) {
+
+        message.textContent =
+          error.message || "Something went wrong.";
+
+      } finally {
+
+        submit.disabled = false;
       }
+
+    });
+
+
+  async function logout() {
+
+    await supabaseClient.auth.signOut();
+
+    updateAccountUI();
+
+    closeModal("settingsModal");
+
+    alert("You have been logged out.");
+  }
+
+
+  async function updateAccountUI() {
+
+    const {
+      data: {
+        user
+      }
+    } = await supabaseClient.auth.getUser();
+
+    const authButton =
+      document.getElementById("authButton");
+
+    const accountStatus =
+      document.getElementById("accountStatus");
+
+    const settingsAuthButton =
+      document.getElementById("settingsAuthButton");
+
+    const loggedInActions =
+      document.getElementById("loggedInActions");
+
+
+    if (user) {
+
+      authButton.textContent = "Account";
+
+      authButton.onclick = openSettings;
+
+      accountStatus.innerHTML =
+        "Logged in as:<br><strong>" +
+        escapeHTML(user.email) +
+        "</strong>";
+
+      settingsAuthButton.style.display = "none";
+
+      loggedInActions.style.display = "block";
+
+    } else {
+
+      authButton.textContent = "Login";
+
+      authButton.onclick = openAuth;
+
+      accountStatus.textContent =
+        "You are not logged in.";
+
+      settingsAuthButton.style.display =
+        "block";
+
+      loggedInActions.style.display =
+        "none";
+    }
+  }
+
+
+  supabaseClient.auth.onAuthStateChange(
+    function(event, session) {
+      updateAccountUI();
+    }
+  );
+
+
+  updateAccountUI();
+
+
+  /* =========================================================
+     TOOL SEARCH
+  ========================================================= */
+
+  function searchTools() {
+
+    const query =
+      document
+        .getElementById("toolSearch")
+        .value
+        .toLowerCase()
+        .trim();
+
+    const cards =
+      document.querySelectorAll(".tool-card");
+
+    cards.forEach(card => {
+
+      const name =
+        card.dataset.name.toLowerCase();
+
+      card.style.display =
+        name.includes(query)
+          ? ""
+          : "none";
+    });
+  }
+
+
+  /* =========================================================
+     TOOL SYSTEM
+  ========================================================= */
+
+  function openTool(tool) {
+
+    document
+      .getElementById("homePage")
+      .style.display = "none";
+
+    document
+      .getElementById("workspace")
+      .classList.add("show");
+
+    const title =
+      document.getElementById("workspaceTitle");
+
+    const content =
+      document.getElementById("workspaceContent");
+
+    if (tool === "calculator") {
+
+      title.textContent = "🧮 Calculator";
+
+      content.innerHTML = `
+
+        <div class="form-group">
+          <label>Calculation</label>
+
+          <input
+            id="calcInput"
+            placeholder="Example: 25 * 4 + 10"
+          >
+        </div>
+
+        <button
+          class="primary-btn"
+          onclick="calculate()"
+        >
+          Calculate
+        </button>
+
+        <div
+          class="result"
+          id="calcResult"
+        >
+          Your result will appear here.
+        </div>
+      `;
+
     }
 
-    function percentage() {
-      const number = prompt("Enter the number:");
 
-      if (number === null) return;
+    if (tool === "percentage") {
 
-      const percent = prompt("Enter percentage:");
+      title.textContent =
+        "📊 Percentage Calculator";
 
-      if (percent === null) return;
+      content.innerHTML = `
 
-      const result = (Number(number) * Number(percent)) / 100;
+        <div class="two-columns">
 
-      alert(percent + "% of " + number + " = " + result);
+          <div class="form-group">
+            <label>Number</label>
+            <input id="percentNumber" type="number">
+          </div>
+
+          <div class="form-group">
+            <label>Percentage</label>
+            <input id="percentValue" type="number">
+          </div>
+
+        </div>
+
+        <button
+          class="primary-btn"
+          onclick="calculatePercentage()"
+        >
+          Calculate
+        </button>
+
+        <div
+          class="result"
+          id="percentResult"
+        ></div>
+      `;
     }
 
-    function ageCalculator() {
-      const birth = prompt("Enter your birth year:");
 
-      if (birth === null) return;
+    if (tool === "age") {
 
-      const year = new Date().getFullYear();
-      const age = year - Number(birth);
+      title.textContent =
+        "🎂 Age Calculator";
 
-      alert("Your approximate age is " + age + " years.");
+      content.innerHTML = `
+
+        <div class="form-group">
+          <label>Date of birth</label>
+          <input id="birthDate" type="date">
+        </div>
+
+        <button
+          class="primary-btn"
+          onclick="calculateAge()"
+        >
+          Calculate Age
+        </button>
+
+        <div
+          class="result"
+          id="ageResult"
+        ></div>
+      `;
     }
 
-    function textCounter() {
-      const text = prompt("Enter your text:");
 
-      if (text === null) return;
+    if (tool === "password") {
 
-      const characters = text.length;
+      title.textContent =
+        "🔐 Password Generator";
 
-      const words = text.trim()
+      content.innerHTML = `
+
+        <div class="form-group">
+
+          <label>Password length</label>
+
+          <input
+            id="passwordLength"
+            type="number"
+            min="6"
+            max="64"
+            value="16"
+          >
+
+        </div>
+
+        <button
+          class="primary-btn"
+          onclick="generatePassword()"
+        >
+          Generate Password
+        </button>
+
+        <div
+          class="result"
+          id="passwordResult"
+        ></div>
+
+        <button
+          class="secondary-btn copy-btn"
+          onclick="copyResult('passwordResult')"
+        >
+          Copy Password
+        </button>
+      `;
+    }
+
+
+    if (tool === "text") {
+
+      title.textContent =
+        "📝 Text Counter";
+
+      content.innerHTML = `
+
+        <div class="form-group">
+
+          <label>Your text</label>
+
+          <textarea
+            id="textInput"
+            rows="10"
+            placeholder="Type or paste your text..."
+            oninput="countText()"
+          ></textarea>
+
+        </div>
+
+        <div
+          class="result"
+          id="textResult"
+        >
+          Characters: 0
+          Words: 0
+          Lines: 0
+        </div>
+      `;
+    }
+
+
+    if (tool === "number") {
+
+      title.textContent =
+        "🔢 Number Checker";
+
+      content.innerHTML = `
+
+        <div class="form-group">
+
+          <label>Number</label>
+
+          <input
+            id="numberInput"
+            type="number"
+          >
+
+        </div>
+
+        <button
+          class="primary-btn"
+          onclick="checkNumber()"
+        >
+          Check Number
+        </button>
+
+        <div
+          class="result"
+          id="numberResult"
+        ></div>
+      `;
+    }
+
+
+    if (tool === "unit") {
+
+      title.textContent =
+        "📏 Unit Converter";
+
+      content.innerHTML = `
+
+        <div class="form-group">
+
+          <label>Conversion</label>
+
+          <select id="unitType">
+
+            <option value="kmmi">
+              Kilometres → Miles
+            </option>
+
+            <option value="mikm">
+              Miles → Kilometres
+            </option>
+
+            <option value="kglb">
+              Kilograms → Pounds
+            </option>
+
+            <option value="lbkg">
+              Pounds → Kilograms
+            </option>
+
+            <option value="cf">
+              Celsius → Fahrenheit
+            </option>
+
+            <option value="fc">
+              Fahrenheit → Celsius
+            </option>
+
+          </select>
+
+        </div>
+
+        <div class="form-group">
+
+          <label>Value</label>
+
+          <input
+            id="unitValue"
+            type="number"
+          >
+
+        </div>
+
+        <button
+          class="primary-btn"
+          onclick="convertUnit()"
+        >
+          Convert
+        </button>
+
+        <div
+          class="result"
+          id="unitResult"
+        ></div>
+      `;
+    }
+
+
+    if (tool === "currency") {
+
+      title.textContent =
+        "💰 Currency Calculator";
+
+      content.innerHTML = `
+
+        <div class="form-group">
+
+          <label>Amount</label>
+
+          <input
+            id="currencyAmount"
+            type="number"
+          >
+
+        </div>
+
+        <div class="form-group">
+
+          <label>Exchange rate</label>
+
+          <input
+            id="currencyRate"
+            type="number"
+            step="any"
+            placeholder="Example: 1500"
+          >
+
+        </div>
+
+        <p style="color:var(--muted);font-size:13px;">
+          Enter how many units of the target currency equal
+          one unit of your starting currency.
+        </p>
+
+        <br>
+
+        <button
+          class="primary-btn"
+          onclick="convertCurrency()"
+        >
+          Convert
+        </button>
+
+        <div
+          class="result"
+          id="currencyResult"
+        ></div>
+      `;
+    }
+
+    trackTool(tool);
+  }
+
+
+  function closeTool() {
+
+    document
+      .getElementById("workspace")
+      .classList.remove("show");
+
+    document
+      .getElementById("homePage")
+      .style.display = "block";
+
+    window.scrollTo({
+      top: 0,
+      behavior: "smooth"
+    });
+  }
+
+
+  /* =========================================================
+     CALCULATOR
+  ========================================================= */
+
+  function calculate() {
+
+    const input =
+      document.getElementById("calcInput").value.trim();
+
+    const result =
+      document.getElementById("calcResult");
+
+    if (!input) {
+      result.textContent =
+        "Enter a calculation.";
+      return;
+    }
+
+    if (!/^[0-9+\-*/().% ]+$/.test(input)) {
+
+      result.textContent =
+        "Invalid calculation.";
+
+      return;
+    }
+
+    try {
+
+      const answer =
+        Function('"use strict"; return (' +
+          input +
+        ')')();
+
+      result.textContent =
+        "Result: " + answer;
+
+    } catch {
+
+      result.textContent =
+        "Unable to calculate. Check your expression.";
+    }
+  }
+
+
+  /* =========================================================
+     PERCENTAGE
+  ========================================================= */
+
+  function calculatePercentage() {
+
+    const number =
+      Number(
+        document.getElementById("percentNumber").value
+      );
+
+    const percentage =
+      Number(
+        document.getElementById("percentValue").value
+      );
+
+    const result =
+      document.getElementById("percentResult");
+
+    if (
+      !Number.isFinite(number) ||
+      !Number.isFinite(percentage)
+    ) {
+
+      result.textContent =
+        "Enter valid numbers.";
+
+      return;
+    }
+
+    result.textContent =
+      percentage +
+      "% of " +
+      number +
+      " = " +
+      ((number * percentage) / 100);
+  }
+
+
+  /* =========================================================
+     AGE
+  ========================================================= */
+
+  function calculateAge() {
+
+    const value =
+      document.getElementById("birthDate").value;
+
+    const result =
+      document.getElementById("ageResult");
+
+    if (!value) {
+
+      result.textContent =
+        "Select your date of birth.";
+
+      return;
+    }
+
+    const birth =
+      new Date(value + "T00:00:00");
+
+    const today =
+      new Date();
+
+    if (birth > today) {
+
+      result.textContent =
+        "Birth date cannot be in the future.";
+
+      return;
+    }
+
+    let years =
+      today.getFullYear() -
+      birth.getFullYear();
+
+    let months =
+      today.getMonth() -
+      birth.getMonth();
+
+    let days =
+      today.getDate() -
+      birth.getDate();
+
+    if (days < 0) {
+
+      months--;
+
+      const previousMonth =
+        new Date(
+          today.getFullYear(),
+          today.getMonth(),
+          0
+        );
+
+      days +=
+        previousMonth.getDate();
+    }
+
+    if (months < 0) {
+
+      years--;
+      months += 12;
+    }
+
+    result.textContent =
+      "Age: " +
+      years +
+      " years, " +
+      months +
+      " months, " +
+      days +
+      " days.";
+  }
+
+
+  /* =========================================================
+     PASSWORD
+  ========================================================= */
+
+  function generatePassword() {
+
+    let length =
+      Number(
+        document.getElementById("passwordLength").value
+      );
+
+    if (!Number.isFinite(length)) {
+      length = 16;
+    }
+
+    length =
+      Math.min(64, Math.max(6, length));
+
+    const chars =
+      "ABCDEFGHIJKLMNOPQRSTUVWXYZ" +
+      "abcdefghijklmnopqrstuvwxyz" +
+      "0123456789" +
+      "!@#$%^&*()_+-=[]{}";
+
+    let password = "";
+
+    const random =
+      new Uint32Array(length);
+
+    crypto.getRandomValues(random);
+
+    for (let i = 0; i < length; i++) {
+
+      password +=
+        chars[random[i] % chars.length];
+    }
+
+    document
+      .getElementById("passwordResult")
+      .textContent =
+        password;
+  }
+
+
+  /* =========================================================
+     TEXT COUNTER
+  ========================================================= */
+
+  function countText() {
+
+    const text =
+      document.getElementById("textInput").value;
+
+    const characters =
+      text.length;
+
+    const words =
+      text.trim()
         ? text.trim().split(/\s+/).length
         : 0;
 
-      alert(
-        "Characters: " + characters +
-        "\nWords: " + words
+    const lines =
+      text
+        ? text.split(/\r?\n/).length
+        : 0;
+
+    document
+      .getElementById("textResult")
+      .textContent =
+        "Characters: " +
+        characters +
+        "\nWords: " +
+        words +
+        "\nLines: " +
+        lines;
+  }
+
+
+  /* =========================================================
+     NUMBER CHECKER
+  ========================================================= */
+
+  function checkNumber() {
+
+    const value =
+      Number(
+        document.getElementById("numberInput").value
+      );
+
+    const result =
+      document.getElementById("numberResult");
+
+    if (!Number.isFinite(value)) {
+
+      result.textContent =
+        "Enter a valid number.";
+
+      return;
+    }
+
+    if (Number.isInteger(value)) {
+
+      result.textContent =
+        value +
+        " is " +
+        (value % 2 === 0 ? "EVEN." : "ODD.");
+
+    } else {
+
+      result.textContent =
+        value +
+        " is not a whole number.";
+    }
+  }
+
+
+  /* =========================================================
+     UNIT CONVERTER
+  ========================================================= */
+
+  function convertUnit() {
+
+    const type =
+      document.getElementById("unitType").value;
+
+    const value =
+      Number(
+        document.getElementById("unitValue").value
+      );
+
+    const result =
+      document.getElementById("unitResult");
+
+    if (!Number.isFinite(value)) {
+
+      result.textContent =
+        "Enter a valid number.";
+
+      return;
+    }
+
+    let answer;
+    let unit;
+
+    switch (type) {
+
+      case "kmmi":
+        answer = value * 0.621371;
+        unit = "miles";
+        break;
+
+      case "mikm":
+        answer = value * 1.609344;
+        unit = "kilometres";
+        break;
+
+      case "kglb":
+        answer = value * 2.2046226218;
+        unit = "pounds";
+        break;
+
+      case "lbkg":
+        answer = value * 0.45359237;
+        unit = "kilograms";
+        break;
+
+      case "cf":
+        answer = (value * 9 / 5) + 32;
+        unit = "°F";
+        break;
+
+      case "fc":
+        answer = (value - 32) * 5 / 9;
+        unit = "°C";
+        break;
+    }
+
+    result.textContent =
+      "Result: " +
+      Number(answer.toFixed(6)) +
+      " " +
+      unit;
+  }
+
+
+  /* =========================================================
+     CURRENCY
+  ========================================================= */
+
+  function convertCurrency() {
+
+    const amount =
+      Number(
+        document.getElementById("currencyAmount").value
+      );
+
+    const rate =
+      Number(
+        document.getElementById("currencyRate").value
+      );
+
+    const result =
+      document.getElementById("currencyResult");
+
+    if (
+      !Number.isFinite(amount) ||
+      !Number.isFinite(rate)
+    ) {
+
+      result.textContent =
+        "Enter valid values.";
+
+      return;
+    }
+
+    result.textContent =
+      "Converted amount: " +
+      (amount * rate).toLocaleString(
+        undefined,
+        {
+          maximumFractionDigits: 4
+        }
+      );
+  }
+
+
+  /* =========================================================
+     COPY
+  ========================================================= */
+
+  async function copyResult(id) {
+
+    const element =
+      document.getElementById(id);
+
+    const text =
+      element.textContent.trim();
+
+    if (!text) return;
+
+    try {
+
+      await navigator.clipboard.writeText(text);
+
+      alert("Copied!");
+
+    } catch {
+
+      alert("Copy failed. Please copy it manually.");
+    }
+  }
+
+
+  /* =========================================================
+     SUPABASE TOOL TRACKING
+  ========================================================= */
+
+  async function trackTool(toolName) {
+
+    try {
+
+      const {
+        data: {
+          user
+        }
+      } = await supabaseClient.auth.getUser();
+
+      await supabaseClient
+        .from("tool_usage")
+        .insert({
+          user_id: user ? user.id : null,
+          tool_name: toolName
+        });
+
+    } catch (error) {
+
+      console.log(
+        "Usage tracking unavailable:",
+        error.message
       );
     }
+  }
 
-    function passwordGenerator() {
-      const chars =
-        "ABCDEFGHIJKLMNOPQRSTUVWXYZ" +
-        "abcdefghijklmnopqrstuvwxyz" +
-        "0123456789!@#$%^&*";
 
-      let password = "";
+  /* =========================================================
+     PAGE NAVIGATION
+  ========================================================= */
 
-      for (let i = 0; i < 16; i++) {
-        password += chars.charAt(
-          Math.floor(Math.random() * chars.length)
-        );
-      }
+  function hideAllPages() {
 
-      alert("Your password:\n\n" + password);
+    document
+      .getElementById("homePage")
+      .style.display = "none";
+
+    document
+      .getElementById("workspace")
+      .classList.remove("show");
+
+    document
+      .querySelectorAll(".content-page")
+      .forEach(page => {
+        page.classList.remove("show");
+      });
+  }
+
+
+  function showHome() {
+
+    hideAllPages();
+
+    document
+      .getElementById("homePage")
+      .style.display = "block";
+
+    window.scrollTo({
+      top: 0,
+      behavior: "smooth"
+    });
+  }
+
+
+  function showPage(id) {
+
+    hideAllPages();
+
+    document
+      .getElementById(id)
+      .classList.add("show");
+
+    window.scrollTo({
+      top: 0,
+      behavior: "smooth"
+    });
+  }
+
+
+  /* =========================================================
+     SECURITY DISPLAY HELPER
+  ========================================================= */
+
+  function escapeHTML(value) {
+
+    return String(value)
+      .replaceAll("&", "&amp;")
+      .replaceAll("<", "&lt;")
+      .replaceAll(">", "&gt;")
+      .replaceAll('"', "&quot;")
+      .replaceAll("'", "&#039;");
+  }
+
+
+  /* =========================================================
+     CLOSE MODALS WHEN CLICKING OUTSIDE
+  ========================================================= */
+
+  document
+    .querySelectorAll(".modal")
+    .forEach(modal => {
+
+      modal.addEventListener("click", function(e) {
+
+        if (e.target === modal) {
+          modal.classList.remove("show");
+        }
+
+      });
+
+    });
+
+
+  /* =========================================================
+     ESC KEY
+  ========================================================= */
+
+  document.addEventListener("keydown", function(e) {
+
+    if (e.key === "Escape") {
+
+      document
+        .querySelectorAll(".modal")
+        .forEach(modal => {
+          modal.classList.remove("show");
+        });
+
     }
 
-    function numberChecker() {
-      const number = prompt("Enter a number:");
+  });
 
-      if (number === null) return;
-
-      if (Number(number) % 2 === 0) {
-        alert(number + " is EVEN.");
-      } else {
-        alert(number + " is ODD.");
-      }
-    }
-
-  </script>
+</script>
 
 </body>
-  </html>
+</html>
