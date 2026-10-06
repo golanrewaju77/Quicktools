@@ -1,0 +1,984 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>QuickTools Admin</title>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+<style>
+*{
+    box-sizing:border-box;
+    margin:0;
+    padding:0;
+}
+
+:root{
+    --bg:#f6f7fb;
+    --card:#fff;
+    --text:#111827;
+    --muted:#64748b;
+    --border:#e5e7eb;
+    --primary:#4f46e5;
+    --danger:#dc2626;
+}
+
+body.dark{
+    --bg:#0b1020;
+    --card:#111827;
+    --text:#f8fafc;
+    --muted:#94a3b8;
+    --border:#273249;
+}
+
+body{
+    font-family:system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+    background:var(--bg);
+    color:var(--text);
+    min-height:100vh;
+}
+
+header{
+    background:var(--card);
+    border-bottom:1px solid var(--border);
+}
+
+.nav{
+    max-width:1200px;
+    margin:auto;
+    padding:18px 20px;
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+}
+
+.logo{
+    font-size:22px;
+    font-weight:900;
+}
+
+.logo span{
+    color:var(--primary);
+}
+
+.actions{
+    display:flex;
+    gap:10px;
+}
+
+button{
+    cursor:pointer;
+    border:0;
+}
+
+.btn{
+    padding:10px 15px;
+    border-radius:10px;
+    background:var(--primary);
+    color:white;
+    font-weight:700;
+}
+
+.btn.dark{
+    background:var(--border);
+    color:var(--text);
+}
+
+.btn.logout{
+    background:var(--danger);
+}
+
+.container{
+    max-width:1200px;
+    margin:auto;
+    padding:30px 20px;
+}
+
+.login{
+    max-width:430px;
+    margin:80px auto;
+    background:var(--card);
+    border:1px solid var(--border);
+    border-radius:20px;
+    padding:30px;
+}
+
+.login h1{
+    margin-bottom:8px;
+}
+
+.login p{
+    color:var(--muted);
+    margin-bottom:25px;
+}
+
+input{
+    width:100%;
+    padding:13px;
+    border:1px solid var(--border);
+    background:var(--bg);
+    color:var(--text);
+    border-radius:10px;
+    margin-bottom:12px;
+    outline:none;
+}
+
+input:focus{
+    border-color:var(--primary);
+}
+
+.error{
+    color:#ef4444;
+    margin-top:12px;
+    font-size:14px;
+}
+
+.dashboard{
+    display:none;
+}
+
+.welcome{
+    margin-bottom:25px;
+}
+
+.welcome h1{
+    font-size:32px;
+}
+
+.welcome p{
+    color:var(--muted);
+}
+
+.stats{
+    display:grid;
+    grid-template-columns:repeat(4,1fr);
+    gap:15px;
+    margin-bottom:25px;
+}
+
+.stat{
+    background:var(--card);
+    border:1px solid var(--border);
+    border-radius:17px;
+    padding:22px;
+}
+
+.stat-icon{
+    font-size:25px;
+    margin-bottom:10px;
+}
+
+.stat-name{
+    color:var(--muted);
+    font-size:14px;
+}
+
+.stat-value{
+    font-size:30px;
+    font-weight:900;
+    margin-top:5px;
+}
+
+.panel{
+    background:var(--card);
+    border:1px solid var(--border);
+    border-radius:17px;
+    padding:22px;
+    margin-bottom:20px;
+}
+
+.panel h2{
+    margin-bottom:18px;
+}
+
+table{
+    width:100%;
+    border-collapse:collapse;
+}
+
+th,td{
+    text-align:left;
+    padding:13px 10px;
+    border-bottom:1px solid var(--border);
+}
+
+th{
+    color:var(--muted);
+    font-size:13px;
+}
+
+td{
+    font-size:14px;
+}
+
+.loading{
+    text-align:center;
+    padding:30px;
+    color:var(--muted);
+}
+
+.denied{
+    max-width:500px;
+    margin:100px auto;
+    text-align:center;
+    background:var(--card);
+    border:1px solid var(--border);
+    border-radius:20px;
+    padding:35px;
+}
+
+.denied h1{
+    margin-bottom:10px;
+}
+
+.denied p{
+    color:var(--muted);
+    margin-bottom:20px;
+}
+
+@media(max-width:850px){
+
+    .stats{
+        grid-template-columns:repeat(2,1fr);
+    }
+
+}
+
+@media(max-width:550px){
+
+    .stats{
+        grid-template-columns:1fr;
+    }
+
+    .welcome h1{
+        font-size:26px;
+    }
+
+    .panel{
+        overflow-x:auto;
+    }
+
+    table{
+        min-width:600px;
+    }
+
+}
+</style>
+</head>
+
+<body>
+
+<header>
+    <div class="nav">
+
+        <div class="logo">
+            Quick<span>Tools</span> Admin
+        </div>
+
+        <div class="actions">
+            <button class="btn dark" onclick="toggleDark()">
+                🌙
+            </button>
+
+            <button class="btn logout" onclick="logout()">
+                Logout
+            </button>
+        </div>
+
+    </div>
+</header>
+
+
+<!-- LOGIN -->
+
+<section id="loginSection" class="login">
+
+    <h1>Admin Login</h1>
+
+    <p>
+        Sign in with the authorized QuickTools administrator account.
+    </p>
+
+    <input
+        id="email"
+        type="email"
+        placeholder="Admin email"
+        autocomplete="email"
+    >
+
+    <input
+        id="password"
+        type="password"
+        placeholder="Password"
+        autocomplete="current-password"
+    >
+
+    <button
+        class="btn"
+        style="width:100%;"
+        onclick="login()"
+    >
+        Sign In
+    </button>
+
+    <div id="loginError" class="error"></div>
+
+</section>
+
+
+<!-- ACCESS DENIED -->
+
+<section id="deniedSection" class="denied" style="display:none;">
+
+    <h1>🚫 Access Denied</h1>
+
+    <p>
+        Your account is not authorized to access the QuickTools
+        administrator dashboard.
+    </p>
+
+    <button class="btn" onclick="logout()">
+        Sign Out
+    </button>
+
+</section>
+
+
+<!-- DASHBOARD -->
+
+<section id="dashboard" class="dashboard">
+
+<div class="container">
+
+    <div class="welcome">
+
+        <h1>Dashboard</h1>
+
+        <p>
+            Monitor QuickTools usage and activity.
+        </p>
+
+    </div>
+
+
+    <!-- STATS -->
+
+    <div class="stats">
+
+        <div class="stat">
+
+            <div class="stat-icon">👥</div>
+
+            <div class="stat-name">
+                Registered Users
+            </div>
+
+            <div id="usersCount" class="stat-value">
+                0
+            </div>
+
+        </div>
+
+
+        <div class="stat">
+
+            <div class="stat-icon">🛠️</div>
+
+            <div class="stat-name">
+                Total Tool Uses
+            </div>
+
+            <div id="usageCount" class="stat-value">
+                0
+            </div>
+
+        </div>
+
+
+        <div class="stat">
+
+            <div class="stat-icon">📅</div>
+
+            <div class="stat-name">
+                Today's Uses
+            </div>
+
+            <div id="todayCount" class="stat-value">
+                0
+            </div>
+
+        </div>
+
+
+        <div class="stat">
+
+            <div class="stat-icon">👀</div>
+
+            <div class="stat-name">
+                Site Visits
+            </div>
+
+            <div id="visitsCount" class="stat-value">
+                0
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- MOST USED -->
+
+    <div class="panel">
+
+        <h2>🔥 Most Used Tools</h2>
+
+        <div id="popularTools" class="loading">
+            Loading...
+        </div>
+
+    </div>
+
+
+    <!-- RECENT ACTIVITY -->
+
+    <div class="panel">
+
+        <h2>🕐 Recent Tool Activity</h2>
+
+        <div id="recentActivity" class="loading">
+            Loading...
+        </div>
+
+    </div>
+
+</div>
+
+</section>
+
+
+<script>
+
+/* ==================================
+   SUPABASE
+================================== */
+
+const SUPABASE_URL =
+"https://vabrpwyjsowbgzoktxvy.supabase.co";
+
+const SUPABASE_KEY =
+"sb_publishable_AJ5Wbwx4q2yAkaaZUl-bvg_dTDNYDbP";
+
+const supabaseClient =
+supabase.createClient(
+    SUPABASE_URL,
+    SUPABASE_KEY
+);
+
+
+/*
+ IMPORTANT:
+ Only this Supabase user is the
+ QuickTools administrator.
+*/
+
+const ADMIN_USER_ID =
+"d8629361-3dcf-4275-b42e-8fe3e48d491a";
+
+
+/* ==================================
+   LOGIN
+================================== */
+
+async function login(){
+
+    const email =
+        document.getElementById("email").value.trim();
+
+    const password =
+        document.getElementById("password").value;
+
+    const error =
+        document.getElementById("loginError");
+
+    error.textContent="";
+
+    if(!email || !password){
+
+        error.textContent=
+            "Enter your email and password.";
+
+        return;
+    }
+
+    const {data,error:authError} =
+        await supabaseClient.auth.signInWithPassword({
+            email,
+            password
+        });
+
+    if(authError){
+
+        error.textContent=
+            authError.message;
+
+        return;
+    }
+
+    await checkAdmin(data.user);
+}
+
+
+/* ==================================
+   CHECK ADMIN
+================================== */
+
+async function checkAdmin(user){
+
+    if(!user){
+
+        showLogin();
+
+        return;
+    }
+
+    /*
+     First check the exact authorized
+     Supabase user ID.
+    */
+
+    if(user.id !== ADMIN_USER_ID){
+
+        await supabaseClient.auth.signOut();
+
+        document.getElementById(
+            "loginSection"
+        ).style.display="none";
+
+        document.getElementById(
+            "dashboard"
+        ).style.display="none";
+
+        document.getElementById(
+            "deniedSection"
+        ).style.display="block";
+
+        return;
+    }
+
+
+    /*
+     Second check admin_users table.
+     */
+
+    const {data,error} =
+        await supabaseClient
+        .from("admin_users")
+        .select("user_id")
+        .eq("user_id",user.id)
+        .maybeSingle();
+
+    if(error || !data){
+
+        await supabaseClient.auth.signOut();
+
+        document.getElementById(
+            "loginSection"
+        ).style.display="none";
+
+        document.getElementById(
+            "deniedSection"
+        ).style.display="block";
+
+        return;
+    }
+
+    showDashboard();
+
+    loadDashboard();
+}
+
+
+/* ==================================
+   SHOW DASHBOARD
+================================== */
+
+function showDashboard(){
+
+    document.getElementById(
+        "loginSection"
+    ).style.display="none";
+
+    document.getElementById(
+        "deniedSection"
+    ).style.display="none";
+
+    document.getElementById(
+        "dashboard"
+    ).style.display="block";
+}
+
+
+function showLogin(){
+
+    document.getElementById(
+        "loginSection"
+    ).style.display="block";
+
+    document.getElementById(
+        "deniedSection"
+    ).style.display="none";
+
+    document.getElementById(
+        "dashboard"
+    ).style.display="none";
+}
+
+
+/* ==================================
+   LOAD DASHBOARD
+================================== */
+
+async function loadDashboard(){
+
+    await Promise.all([
+        loadUsers(),
+        loadUsage(),
+        loadToday(),
+        loadVisits(),
+        loadPopularTools(),
+        loadRecentActivity()
+    ]);
+}
+
+
+/* ==================================
+   USERS
+================================== */
+
+async function loadUsers(){
+
+    const {count,error} =
+        await supabaseClient
+        .from("profiles")
+        .select("*",{count:"exact",head:true});
+
+    if(!error){
+
+        document.getElementById(
+            "usersCount"
+        ).textContent =
+            Number(count || 0).toLocaleString();
+
+    }
+}
+
+
+/* ==================================
+   TOTAL USAGE
+================================== */
+
+async function loadUsage(){
+
+    const {count,error} =
+        await supabaseClient
+        .from("tool_usage")
+        .select("*",{count:"exact",head:true});
+
+    if(!error){
+
+        document.getElementById(
+            "usageCount"
+        ).textContent =
+            Number(count || 0).toLocaleString();
+
+    }
+}
+
+
+/* ==================================
+   TODAY'S USAGE
+================================== */
+
+async function loadToday(){
+
+    const now=new Date();
+
+    const start=new Date(
+        now.getFullYear(),
+        now.getMonth(),
+        now.getDate()
+    ).toISOString();
+
+    const {count,error} =
+        await supabaseClient
+        .from("tool_usage")
+        .select("*",{count:"exact",head:true})
+        .gte("created_at",start);
+
+    if(!error){
+
+        document.getElementById(
+            "todayCount"
+        ).textContent =
+            Number(count || 0).toLocaleString();
+
+    }
+}
+
+
+/* ==================================
+   SITE VISITS
+================================== */
+
+async function loadVisits(){
+
+    const {count,error} =
+        await supabaseClient
+        .from("site_visits")
+        .select("*",{count:"exact",head:true});
+
+    if(!error){
+
+        document.getElementById(
+            "visitsCount"
+        ).textContent =
+            Number(count || 0).toLocaleString();
+
+    }
+}
+
+
+/* ==================================
+   POPULAR TOOLS
+================================== */
+
+async function loadPopularTools(){
+
+    const box=
+        document.getElementById("popularTools");
+
+    const {data,error} =
+        await supabaseClient
+        .from("tool_usage")
+        .select("tool_name");
+
+    if(error){
+
+        box.textContent=
+            "Unable to load tool statistics.";
+
+        return;
+    }
+
+    if(!data || !data.length){
+
+        box.textContent=
+            "No tool usage yet.";
+
+        return;
+    }
+
+    const counts={};
+
+    data.forEach(row=>{
+
+        const name=row.tool_name || "Unknown";
+
+        counts[name]=(counts[name] || 0)+1;
+
+    });
+
+    const sorted=
+        Object.entries(counts)
+        .sort((a,b)=>b[1]-a[1])
+        .slice(0,10);
+
+    box.innerHTML=`
+
+        <table>
+
+            <thead>
+
+                <tr>
+                    <th>Tool</th>
+                    <th>Uses</th>
+                </tr>
+
+            </thead>
+
+            <tbody>
+
+                ${sorted.map(item=>`
+
+                    <tr>
+                        <td>${escapeHTML(item[0])}</td>
+                        <td>${item[1].toLocaleString()}</td>
+                    </tr>
+
+                `).join("")}
+
+            </tbody>
+
+        </table>
+    `;
+}
+
+
+/* ==================================
+   RECENT ACTIVITY
+================================== */
+
+async function loadRecentActivity(){
+
+    const box=
+        document.getElementById("recentActivity");
+
+    const {data,error} =
+        await supabaseClient
+        .from("tool_usage")
+        .select("tool_name,user_id,created_at")
+        .order("created_at",{ascending:false})
+        .limit(20);
+
+    if(error){
+
+        box.textContent=
+            "Unable to load recent activity.";
+
+        return;
+    }
+
+    if(!data || !data.length){
+
+        box.textContent=
+            "No activity yet.";
+
+        return;
+    }
+
+    box.innerHTML=`
+
+        <table>
+
+            <thead>
+
+                <tr>
+                    <th>Tool</th>
+                    <th>User</th>
+                    <th>Time</th>
+                </tr>
+
+            </thead>
+
+            <tbody>
+
+                ${data.map(row=>`
+
+                    <tr>
+
+                        <td>
+                            ${escapeHTML(row.tool_name || "Unknown")}
+                        </td>
+
+                        <td>
+                            ${row.user_id
+                                ? escapeHTML(row.user_id)
+                                : "Guest"}
+                        </td>
+
+                        <td>
+                            ${new Date(
+                                row.created_at
+                            ).toLocaleString()}
+                        </td>
+
+                    </tr>
+
+                `).join("")}
+
+            </tbody>
+
+        </table>
+    `;
+}
+
+
+/* ==================================
+   LOGOUT
+================================== */
+
+async function logout(){
+
+    await supabaseClient.auth.signOut();
+
+    showLogin();
+
+}
+
+
+/* ==================================
+   DARK MODE
+================================== */
+
+function toggleDark(){
+
+    document.body.classList.toggle("dark");
+
+    localStorage.setItem(
+        "quicktools-admin-dark",
+        document.body.classList.contains("dark")
+    );
+}
+
+if(
+    localStorage.getItem(
+        "quicktools-admin-dark"
+    )==="true"
+){
+
+    document.body.classList.add("dark");
+
+}
+
+
+/* ==================================
+   SECURITY / HTML ESCAPE
+================================== */
+
+function escapeHTML(value){
+
+    return String(value)
+        .replaceAll("&","&amp;")
+        .replaceAll("<","&lt;")
+        .replaceAll(">","&gt;")
+        .replaceAll('"',"&quot;")
+        .replaceAll("'","&#039;");
+}
+
+
+/* ==================================
+   CHECK EXISTING SESSION
+================================== */
+
+(async function(){
+
+    const {data} =
+        await supabaseClient.auth.getSession();
+
+    if(data.session){
+
+        await checkAdmin(
+            data.session.user
+        );
+
+    }
+
+})();
+
+</script>
+
+</body>
+</html>
