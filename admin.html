@@ -1,0 +1,1043 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="robots" content="noindex,nofollow">
+  <title>QuickTools Admin</title>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background: #f5f7fb;
+      color: #171923;
+    }
+
+    .container {
+      max-width: 1200px;
+      margin: auto;
+      padding: 20px;
+    }
+
+    .brand {
+      color: #6d5dfc;
+      font-size: 25px;
+      font-weight: 800;
+    }
+
+    .card {
+      background: white;
+      border: 1px solid #e2e5ed;
+      border-radius: 16px;
+      padding: 20px;
+      margin-bottom: 18px;
+      box-shadow: 0 8px 25px rgba(0,0,0,.05);
+    }
+
+    .login-card {
+      max-width: 430px;
+      margin: 80px auto;
+    }
+
+    input {
+      width: 100%;
+      padding: 13px;
+      margin: 7px 0 15px;
+      border: 1px solid #dfe3eb;
+      border-radius: 9px;
+      font-size: 15px;
+    }
+
+    button {
+      border: 0;
+      border-radius: 9px;
+      padding: 12px 16px;
+      background: #6d5dfc;
+      color: white;
+      font-weight: 700;
+      cursor: pointer;
+    }
+
+    button:hover {
+      opacity: .9;
+    }
+
+    .secondary {
+      background: white;
+      color: #222;
+      border: 1px solid #ddd;
+    }
+
+    .hidden {
+      display: none !important;
+    }
+
+    .message {
+      padding: 11px;
+      border-radius: 9px;
+      margin-bottom: 15px;
+      display: none;
+    }
+
+    .error {
+      display: block;
+      background: #ffecec;
+      color: #b42323;
+    }
+
+    .success {
+      display: block;
+      background: #eaf8ef;
+      color: #16733a;
+    }
+
+    .top {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 15px;
+      margin-bottom: 20px;
+    }
+
+    .actions {
+      display: flex;
+      gap: 8px;
+    }
+
+    .stats {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 14px;
+    }
+
+    .stat-title {
+      color: #687083;
+      font-size: 14px;
+    }
+
+    .stat-number {
+      font-size: 29px;
+      font-weight: 800;
+      margin-top: 8px;
+    }
+
+    .revenue {
+      font-size: 28px;
+      font-weight: 800;
+      color: #16733a;
+    }
+
+    .table-wrap {
+      overflow-x: auto;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      min-width: 750px;
+    }
+
+    th,
+    td {
+      text-align: left;
+      padding: 11px;
+      border-bottom: 1px solid #e7e9ef;
+      font-size: 13px;
+    }
+
+    th {
+      background: #f7f8fb;
+    }
+
+    .badge {
+      display: inline-block;
+      padding: 5px 9px;
+      border-radius: 20px;
+      font-size: 11px;
+      font-weight: 700;
+      background: #eeeaff;
+      color: #5b4be7;
+    }
+
+    .paid {
+      background: #e9f8ee;
+      color: #137a35;
+    }
+
+    .pending {
+      background: #fff5dc;
+      color: #9a6700;
+    }
+
+    .failed {
+      background: #feecec;
+      color: #b42323;
+    }
+
+    .muted {
+      color: #687083;
+      font-size: 13px;
+    }
+
+    @media(max-width:800px) {
+      .stats {
+        grid-template-columns: repeat(2, 1fr);
+      }
+    }
+
+    @media(max-width:500px) {
+      .container {
+        padding: 12px;
+      }
+
+      .stats {
+        grid-template-columns: 1fr;
+      }
+
+      .top {
+        align-items: flex-start;
+        flex-direction: column;
+      }
+
+      .actions {
+        width: 100%;
+      }
+
+      .actions button {
+        flex: 1;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+<div class="container">
+
+  <!-- LOGIN -->
+  <div id="loginSection" class="card login-card">
+
+    <div class="brand">⚡ QuickTools Admin</div>
+
+    <p class="muted">
+      Owner-only administration dashboard.
+    </p>
+
+    <div id="loginMessage" class="message"></div>
+
+    <label>Email</label>
+
+    <input
+      id="adminEmail"
+      type="email"
+      value="golanrewaju77@gmail.com"
+      autocomplete="email"
+    >
+
+    <label>Password</label>
+
+    <input
+      id="adminPassword"
+      type="password"
+      placeholder="Enter your password"
+      autocomplete="current-password"
+    >
+
+    <button
+      onclick="adminLogin()"
+      style="width:100%;"
+    >
+      Sign in to Admin
+    </button>
+
+  </div>
+
+
+  <!-- DASHBOARD -->
+  <div id="dashboardSection" class="hidden">
+
+    <div class="top">
+
+      <div>
+        <div class="brand">
+          ⚡ QuickTools Admin
+        </div>
+
+        <div
+          id="loggedInEmail"
+          class="muted"
+        ></div>
+      </div>
+
+      <div class="actions">
+
+        <button
+          class="secondary"
+          onclick="loadDashboard()"
+        >
+          🔄 Refresh
+        </button>
+
+        <button
+          onclick="logout()"
+        >
+          Logout
+        </button>
+
+      </div>
+
+    </div>
+
+
+    <div id="dashboardMessage" class="message"></div>
+
+
+    <!-- STATISTICS -->
+
+    <div class="stats">
+
+      <div class="card">
+
+        <div class="stat-title">
+          Total Users
+        </div>
+
+        <div
+          id="totalUsers"
+          class="stat-number"
+        >
+          0
+        </div>
+
+      </div>
+
+
+      <div class="card">
+
+        <div class="stat-title">
+          Paid Customers
+        </div>
+
+        <div
+          id="paidCustomers"
+          class="stat-number"
+        >
+          0
+        </div>
+
+      </div>
+
+
+      <div class="card">
+
+        <div class="stat-title">
+          Total Payments
+        </div>
+
+        <div
+          id="totalPayments"
+          class="stat-number"
+        >
+          0
+        </div>
+
+      </div>
+
+
+      <div class="card">
+
+        <div class="stat-title">
+          Successful Payments
+        </div>
+
+        <div
+          id="successfulPayments"
+          class="stat-number"
+        >
+          0
+        </div>
+
+      </div>
+
+    </div>
+
+
+    <!-- REVENUE -->
+
+    <div class="card">
+
+      <div class="stat-title">
+        Total Successful Revenue
+      </div>
+
+      <div
+        id="totalRevenue"
+        class="revenue"
+      >
+        ₦0.00
+      </div>
+
+    </div>
+
+
+    <!-- PAYMENTS -->
+
+    <div class="card">
+
+      <h2>
+        💳 Recent Payments
+      </h2>
+
+      <p class="muted">
+        Latest customer payment records.
+      </p>
+
+      <div class="table-wrap">
+
+        <table>
+
+          <thead>
+
+            <tr>
+              <th>Date</th>
+              <th>Customer</th>
+              <th>Plan</th>
+              <th>Provider</th>
+              <th>Amount</th>
+              <th>Status</th>
+              <th>Reference</th>
+            </tr>
+
+          </thead>
+
+          <tbody id="paymentsTable">
+
+            <tr>
+              <td colspan="7">
+                Loading...
+              </td>
+            </tr>
+
+          </tbody>
+
+        </table>
+
+      </div>
+
+    </div>
+
+
+    <!-- SUBSCRIPTIONS -->
+
+    <div class="card">
+
+      <h2>
+        ⭐ Premium Subscriptions
+      </h2>
+
+      <p class="muted">
+        Customers currently using Premium.
+      </p>
+
+      <div class="table-wrap">
+
+        <table>
+
+          <thead>
+
+            <tr>
+              <th>Customer</th>
+              <th>Plan</th>
+              <th>Status</th>
+              <th>Provider</th>
+              <th>Started</th>
+              <th>Expires</th>
+              <th>Reference</th>
+            </tr>
+
+          </thead>
+
+          <tbody id="subscriptionsTable">
+
+            <tr>
+              <td colspan="7">
+                Loading...
+              </td>
+            </tr>
+
+          </tbody>
+
+        </table>
+
+      </div>
+
+    </div>
+
+  </div>
+
+</div>
+
+
+<script>
+
+const SUPABASE_URL =
+  "https://vabrpwyjsowbgzoktxvy.supabase.co";
+
+const SUPABASE_KEY =
+  "sb_publishable_AJ5Wbwx4q2yAkaaZUl-bvg_dTDNYDbP";
+
+const ADMIN_EMAIL =
+  "golanrewaju77@gmail.com";
+
+const supabaseClient =
+  window.supabase.createClient(
+    SUPABASE_URL,
+    SUPABASE_KEY
+  );
+
+
+/* MESSAGE */
+
+function showMessage(
+  elementId,
+  message,
+  type
+) {
+
+  const element =
+    document.getElementById(elementId);
+
+  element.textContent = message;
+
+  element.className =
+    "message " + type;
+
+}
+
+
+/* MONEY */
+
+function formatMoney(kobo) {
+
+  const naira =
+    Number(kobo || 0) / 100;
+
+  return "₦" +
+    naira.toLocaleString(
+      "en-NG",
+      {
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2
+      }
+    );
+
+}
+
+
+/* DATE */
+
+function formatDate(value) {
+
+  if (!value) {
+    return "—";
+  }
+
+  return new Date(value)
+    .toLocaleString("en-NG");
+
+}
+
+
+/* SAFE TEXT */
+
+function escapeHTML(value) {
+
+  return String(value ?? "")
+    .replace(/[&<>"']/g, function(char) {
+
+      return {
+        "&": "&amp;",
+        "<": "&lt;",
+        ">": "&gt;",
+        '"': "&quot;",
+        "'": "&#039;"
+
+      }[char];
+
+    });
+
+}
+
+
+/* LOGIN */
+
+async function adminLogin() {
+
+  const email =
+    document
+      .getElementById("adminEmail")
+      .value
+      .trim()
+      .toLowerCase();
+
+  const password =
+    document
+      .getElementById("adminPassword")
+      .value;
+
+
+  if (email !== ADMIN_EMAIL) {
+
+    showMessage(
+      "loginMessage",
+      "This account is not authorized to access the admin dashboard.",
+      "error"
+    );
+
+    return;
+
+  }
+
+
+  if (!password) {
+
+    showMessage(
+      "loginMessage",
+      "Please enter your password.",
+      "error"
+    );
+
+    return;
+
+  }
+
+
+  showMessage(
+    "loginMessage",
+    "Signing in...",
+    "success"
+  );
+
+
+  const {
+    data,
+    error
+  } =
+    await supabaseClient.auth
+      .signInWithPassword({
+        email: email,
+        password: password
+      });
+
+
+  if (error) {
+
+    showMessage(
+      "loginMessage",
+      error.message,
+      "error"
+    );
+
+    return;
+
+  }
+
+
+  if (
+    !data.user ||
+    data.user.email.toLowerCase() !== ADMIN_EMAIL
+  ) {
+
+    await supabaseClient.auth.signOut();
+
+    showMessage(
+      "loginMessage",
+      "Unauthorized account.",
+      "error"
+    );
+
+    return;
+
+  }
+
+
+  openDashboard(data.user);
+
+}
+
+
+/* OPEN DASHBOARD */
+
+async function openDashboard(user) {
+
+  document
+    .getElementById("loginSection")
+    .classList
+    .add("hidden");
+
+  document
+    .getElementById("dashboardSection")
+    .classList
+    .remove("hidden");
+
+
+  document
+    .getElementById("loggedInEmail")
+    .textContent =
+      "Signed in as " +
+      user.email;
+
+
+  await loadDashboard();
+
+}
+
+
+/* LOAD DASHBOARD */
+
+async function loadDashboard() {
+
+  showMessage(
+    "dashboardMessage",
+    "Loading dashboard...",
+    "success"
+  );
+
+
+  const {
+    data,
+    error
+  } =
+    await supabaseClient
+      .rpc(
+        "quicktools_admin_dashboard"
+      );
+
+
+  if (error) {
+
+    showMessage(
+      "dashboardMessage",
+      "Could not load dashboard: " +
+      error.message,
+      "error"
+    );
+
+    return;
+
+  }
+
+
+  /* STATISTICS */
+
+  document
+    .getElementById("totalUsers")
+    .textContent =
+      Number(
+        data.customers || 0
+      ).toLocaleString();
+
+
+  document
+    .getElementById("paidCustomers")
+    .textContent =
+      Number(
+        data.paid_customers || 0
+      ).toLocaleString();
+
+
+  document
+    .getElementById("totalPayments")
+    .textContent =
+      Number(
+        data.payments || 0
+      ).toLocaleString();
+
+
+  document
+    .getElementById("successfulPayments")
+    .textContent =
+      Number(
+        data.successful_payments || 0
+      ).toLocaleString();
+
+
+  document
+    .getElementById("totalRevenue")
+    .textContent =
+      formatMoney(
+        data.revenue_kobo
+      );
+
+
+  /* PAYMENTS */
+
+  const payments =
+    data.recent_payments || [];
+
+
+  const paymentsTable =
+    document.getElementById(
+      "paymentsTable"
+    );
+
+
+  if (!payments.length) {
+
+    paymentsTable.innerHTML =
+      `
+      <tr>
+        <td colspan="7">
+          No payments yet.
+        </td>
+      </tr>
+      `;
+
+  } else {
+
+    paymentsTable.innerHTML =
+      payments.map(function(payment) {
+
+        let statusClass = "";
+
+        if (
+          payment.status ===
+          "success"
+        ) {
+          statusClass = "paid";
+        }
+
+        if (
+          payment.status ===
+          "pending"
+        ) {
+          statusClass = "pending";
+        }
+
+        if (
+          payment.status ===
+          "failed"
+        ) {
+          statusClass = "failed";
+        }
+
+
+        return `
+
+        <tr>
+
+          <td>
+            ${formatDate(
+              payment.created_at
+            )}
+          </td>
+
+          <td>
+            ${escapeHTML(
+              payment.email ||
+              "Unknown"
+            )}
+          </td>
+
+          <td>
+            ${escapeHTML(
+              payment.plan ||
+              "—"
+            )}
+          </td>
+
+          <td>
+            ${escapeHTML(
+              payment.provider ||
+              "—"
+            )}
+          </td>
+
+          <td>
+            ${formatMoney(
+              payment.amount_kobo
+            )}
+          </td>
+
+          <td>
+            <span class="badge ${statusClass}">
+              ${escapeHTML(
+                payment.status ||
+                "—"
+              )}
+            </span>
+          </td>
+
+          <td>
+            ${escapeHTML(
+              payment.reference ||
+              "—"
+            )}
+          </td>
+
+        </tr>
+
+        `;
+
+      }).join("");
+
+  }
+
+
+  /* SUBSCRIPTIONS */
+
+  const subscriptions =
+    data.subscriptions || [];
+
+
+  const subscriptionsTable =
+    document.getElementById(
+      "subscriptionsTable"
+    );
+
+
+  if (!subscriptions.length) {
+
+    subscriptionsTable.innerHTML =
+      `
+      <tr>
+        <td colspan="7">
+          No Premium subscriptions yet.
+        </td>
+      </tr>
+      `;
+
+  } else {
+
+    subscriptionsTable.innerHTML =
+      subscriptions.map(function(subscription) {
+
+        return `
+
+        <tr>
+
+          <td>
+            ${escapeHTML(
+              subscription.email ||
+              "Unknown"
+            )}
+          </td>
+
+          <td>
+            <span class="badge">
+              ${escapeHTML(
+                subscription.plan ||
+                "—"
+              )}
+            </span>
+          </td>
+
+          <td>
+            ${escapeHTML(
+              subscription.status ||
+              "—"
+            )}
+          </td>
+
+          <td>
+            ${escapeHTML(
+              subscription.provider ||
+              "—"
+            )}
+          </td>
+
+          <td>
+            ${formatDate(
+              subscription.started_at
+            )}
+          </td>
+
+          <td>
+            ${formatDate(
+              subscription.expires_at
+            )}
+          </td>
+
+          <td>
+            ${escapeHTML(
+              subscription.reference ||
+              "—"
+            )}
+          </td>
+
+        </tr>
+
+        `;
+
+      }).join("");
+
+  }
+
+
+  document
+    .getElementById(
+      "dashboardMessage"
+    )
+    .className =
+      "message";
+
+}
+
+
+/* LOGOUT */
+
+async function logout() {
+
+  await supabaseClient
+    .auth
+    .signOut();
+
+  location.reload();
+
+}
+
+
+/* CHECK EXISTING SESSION */
+
+async function checkSession() {
+
+  const {
+    data
+  } =
+    await supabaseClient
+      .auth
+      .getSession();
+
+
+  const user =
+    data?.session?.user;
+
+
+  if (
+    user &&
+    user.email &&
+    user.email.toLowerCase() ===
+      ADMIN_EMAIL
+  ) {
+
+    openDashboard(user);
+
+  }
+
+}
+
+
+checkSession();
+
+
+</script>
+
+</body>
+</html>
