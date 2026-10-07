@@ -1,0 +1,4139 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="QuickTools - Free everyday calculators, converters, generators and useful online tools.">
+<meta name="keywords" content="calculator, percentage calculator, age calculator, BMI, loan calculator, unit converter, password generator, GPA calculator">
+<meta name="theme-color" content="#6d5dfc">
+<title>QuickTools - Free Online Tools</title>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+
+:root{
+--bg:#f5f7fb;
+--card:#fff;
+--text:#171923;
+--muted:#687083;
+--primary:#6d5dfc;
+--primary2:#8a7cff;
+--border:#e4e7ef;
+--input:#f8f9fc;
+--shadow:0 10px 30px rgba(25,25,60,.08);
+--danger:#e5484d;
+--success:#16a34a
+}
+
+body.dark{
+--bg:#0e1020;
+--card:#171a2c;
+--text:#f5f7ff;
+--muted:#aeb4c7;
+--primary:#8174ff;
+--primary2:#9c92ff;
+--border:#2a2e45;
+--input:#101324;
+--shadow:0 10px 30px rgba(0,0,0,.25)
+}
+
+body{
+font-family:Arial,Helvetica,sans-serif;
+background:var(--bg);
+color:var(--text);
+line-height:1.5;
+transition:.2s
+}
+
+button,input,select,textarea{font:inherit}
+button{cursor:pointer}
+a{color:inherit;text-decoration:none}
+
+header{
+position:sticky;
+top:0;
+z-index:100;
+background:var(--card);
+border-bottom:1px solid var(--border);
+backdrop-filter:blur(12px)
+}
+
+.nav{
+max-width:1200px;
+margin:auto;
+min-height:68px;
+padding:10px 18px;
+display:flex;
+align-items:center;
+justify-content:space-between;
+gap:15px
+}
+
+.logo{
+font-size:23px;
+font-weight:800;
+color:var(--primary);
+white-space:nowrap
+}
+
+.nav-actions{
+display:flex;
+align-items:center;
+gap:8px
+}
+
+.nav-btn,.theme-btn{
+border:1px solid var(--border);
+background:var(--card);
+color:var(--text);
+padding:9px 13px;
+border-radius:10px
+}
+
+.account-btn{
+background:var(--primary);
+color:#fff;
+border:none;
+padding:10px 14px;
+border-radius:10px;
+font-weight:700
+}
+
+.hero{
+max-width:1000px;
+margin:auto;
+padding:50px 18px 30px;
+text-align:center
+}
+
+.hero h1{
+font-size:clamp(32px,6vw,54px);
+margin-bottom:12px
+}
+
+.hero h1 span{color:var(--primary)}
+
+.hero p{
+color:var(--muted);
+max-width:650px;
+margin:auto;
+font-size:17px
+}
+
+.search-wrap{
+max-width:700px;
+margin:25px auto 0;
+position:relative
+}
+
+.search-wrap input{
+width:100%;
+padding:15px 18px;
+border:1px solid var(--border);
+border-radius:14px;
+background:var(--card);
+color:var(--text);
+outline:none;
+box-shadow:var(--shadow)
+}
+
+.categories{
+max-width:1200px;
+margin:0 auto 25px;
+padding:0 18px;
+display:flex;
+gap:8px;
+overflow-x:auto
+}
+
+.cat-btn{
+flex:0 0 auto;
+padding:9px 15px;
+border:1px solid var(--border);
+border-radius:20px;
+background:var(--card);
+color:var(--text)
+}
+
+.cat-btn.active{
+background:var(--primary);
+color:#fff;
+border-color:var(--primary)
+}
+
+/* PREMIUM */
+
+.premium-section{
+max-width:1200px;
+margin:0 auto 30px;
+padding:0 18px
+}
+
+.premium-banner{
+background:linear-gradient(135deg,#4e42d9,#7c69ff);
+color:#fff;
+border-radius:22px;
+padding:25px;
+box-shadow:0 15px 40px rgba(78,66,217,.25)
+}
+
+.premium-banner h2{
+font-size:25px;
+margin-bottom:6px
+}
+
+.premium-banner p{
+opacity:.92;
+margin-bottom:18px
+}
+
+.plans{
+display:grid;
+grid-template-columns:repeat(3,1fr);
+gap:12px
+}
+
+.plan-card{
+background:rgba(255,255,255,.13);
+border:1px solid rgba(255,255,255,.25);
+border-radius:15px;
+padding:17px
+}
+
+.plan-card strong{
+display:block;
+font-size:22px
+}
+
+.plan-card small{
+display:block;
+opacity:.85;
+margin:5px 0 14px
+}
+
+.plan-card button{
+width:100%;
+border:0;
+border-radius:10px;
+padding:11px;
+background:#fff;
+color:#4e42d9;
+font-weight:800
+}
+
+.premium-status{
+margin-top:15px;
+font-weight:700
+}
+
+.premium-lock{
+display:inline-block;
+margin-left:5px;
+font-size:10px;
+background:#eeeaff;
+color:#5b4be7;
+padding:3px 7px;
+border-radius:20px;
+font-weight:800
+}
+
+/* TOOLS */
+
+.tools-grid{
+max-width:1200px;
+margin:auto;
+padding:0 18px 50px;
+display:grid;
+grid-template-columns:repeat(auto-fit,minmax(250px,1fr));
+gap:18px
+}
+
+.tool-card{
+background:var(--card);
+border:1px solid var(--border);
+border-radius:18px;
+padding:20px;
+box-shadow:var(--shadow)
+}
+
+.tool-card h3{margin-bottom:6px}
+
+.tool-card p{
+color:var(--muted);
+font-size:14px;
+min-height:42px;
+margin-bottom:15px
+}
+
+.tool-card .open-btn{
+width:100%;
+border:none;
+padding:11px;
+border-radius:10px;
+background:var(--primary);
+color:#fff;
+font-weight:700
+}
+
+.tool-icon{
+font-size:28px;
+margin-bottom:8px
+}
+
+.tool-panel{
+display:none;
+margin-top:15px;
+border-top:1px solid var(--border);
+padding-top:15px
+}
+
+.tool-panel.show{display:block}
+
+.field{margin-bottom:10px}
+
+.field label{
+display:block;
+font-size:13px;
+color:var(--muted);
+margin-bottom:5px
+}
+
+.field input,
+.field select,
+.field textarea,
+.modal input,
+.modal select{
+width:100%;
+padding:11px 12px;
+border:1px solid var(--border);
+background:var(--input);
+color:var(--text);
+border-radius:9px;
+outline:none
+}
+
+textarea{
+resize:vertical;
+min-height:100px
+}
+
+.action{
+width:100%;
+padding:11px;
+border:none;
+border-radius:9px;
+background:var(--primary);
+color:#fff;
+font-weight:700;
+margin-top:5px
+}
+
+.result{
+margin-top:12px;
+padding:12px;
+background:var(--input);
+border:1px solid var(--border);
+border-radius:9px;
+font-weight:700;
+word-break:break-word
+}
+
+.secondary{
+background:var(--input);
+color:var(--text);
+border:1px solid var(--border)
+}
+
+.footer{
+border-top:1px solid var(--border);
+background:var(--card);
+padding:35px 18px;
+text-align:center
+}
+
+.footer-links{
+display:flex;
+justify-content:center;
+flex-wrap:wrap;
+gap:18px;
+margin:15px 0
+}
+
+.footer-links a{color:var(--muted)}
+.footer-links a:hover{color:var(--primary)}
+
+.copyright{
+color:var(--muted);
+font-size:13px
+}
+
+/* MODAL */
+
+.modal-overlay{
+position:fixed;
+inset:0;
+background:rgba(0,0,0,.65);
+z-index:1000;
+display:none;
+align-items:center;
+justify-content:center;
+padding:18px
+}
+
+.modal-overlay.show{display:flex}
+
+.modal{
+width:100%;
+max-width:450px;
+max-height:90vh;
+overflow-y:auto;
+background:var(--card);
+border:1px solid var(--border);
+border-radius:20px;
+padding:25px;
+box-shadow:0 25px 70px rgba(0,0,0,.3);
+position:relative
+}
+
+.close{
+position:absolute;
+right:15px;
+top:12px;
+width:35px;
+height:35px;
+border:none;
+border-radius:50%;
+background:var(--input);
+color:var(--text);
+font-size:20px
+}
+
+.modal h2{margin-bottom:5px}
+
+.modal-subtitle{
+color:var(--muted);
+font-size:14px;
+margin-bottom:20px
+}
+
+.auth-tabs{
+display:flex;
+background:var(--input);
+padding:4px;
+border-radius:10px;
+margin-bottom:18px
+}
+
+.auth-tab{
+flex:1;
+padding:9px;
+border:none;
+background:transparent;
+color:var(--muted);
+border-radius:8px
+}
+
+.auth-tab.active{
+background:var(--primary);
+color:#fff
+}
+
+.auth-message{
+padding:10px;
+border-radius:8px;
+margin-bottom:12px;
+display:none;
+font-size:14px
+}
+
+.auth-message.error{
+display:block;
+background:rgba(229,72,77,.12);
+color:var(--danger)
+}
+
+.auth-message.success{
+display:block;
+background:rgba(22,163,74,.12);
+color:var(--success)
+}
+
+.forgot{
+display:block;
+text-align:right;
+margin:10px 0;
+font-size:13px;
+color:var(--primary);
+cursor:pointer
+}
+
+.account-panel{display:none}
+.account-panel.show{display:block}
+
+.account-avatar{
+width:70px;
+height:70px;
+border-radius:50%;
+background:var(--primary);
+color:#fff;
+display:flex;
+align-items:center;
+justify-content:center;
+font-size:28px;
+font-weight:800;
+margin:5px auto 15px
+}
+
+.account-info{
+text-align:center;
+margin-bottom:20px
+}
+
+.account-info strong{
+display:block;
+font-size:20px
+}
+
+.account-info span{
+color:var(--muted);
+font-size:14px
+}
+
+.account-actions{
+display:grid;
+gap:9px
+}
+
+.danger{background:var(--danger)}
+
+.settings-section{
+border-top:1px solid var(--border);
+margin-top:20px;
+padding-top:18px
+}
+
+.settings-row{
+display:flex;
+justify-content:space-between;
+align-items:center;
+gap:15px;
+padding:12px 0
+}
+
+.settings-row span{
+color:var(--muted);
+font-size:14px
+}
+
+.toggle{
+width:48px;
+height:26px;
+border-radius:20px;
+background:#777;
+position:relative;
+border:none
+}
+
+.toggle::after{
+content:"";
+width:20px;
+height:20px;
+background:#fff;
+border-radius:50%;
+position:absolute;
+left:3px;
+top:3px;
+transition:.2s
+}
+
+.toggle.on{background:var(--primary)}
+.toggle.on::after{left:25px}
+
+.hidden{display:none!important}
+
+@media(max-width:700px){
+.plans{grid-template-columns:1fr}
+}
+
+@media(max-width:600px){
+.nav{padding:10px 12px}
+.logo{font-size:19px}
+.nav-btn{display:none}
+.hero{padding-top:35px}
+.tools-grid{grid-template-columns:1fr}
+.modal{padding:20px}
+}
+</style>
+</head>
+
+<body>
+
+<header>
+<div class="nav">
+
+<a href="index.html" class="logo">⚡ QuickTools</a>
+
+<div class="nav-actions">
+<button class="nav-btn" onclick="scrollToTools()">Tools</button>
+<button class="theme-btn" onclick="toggleTheme()" id="themeBtn">🌙</button>
+<button class="account-btn" onclick="openAccount()">Account</button>
+</div>
+
+</div>
+</header>
+
+<main>
+
+<section class="hero">
+
+<h1>
+Useful Tools.
+<span>All in One Place.</span>
+</h1>
+
+<p>
+Free, fast and simple online tools for calculations, conversions,
+text processing and everyday tasks.
+</p>
+
+<div class="search-wrap">
+<input
+type="search"
+id="searchInput"
+placeholder="Search for a tool..."
+oninput="searchTools()">
+</div>
+
+</section>
+
+
+<!-- PREMIUM SECTION -->
+
+<section class="premium-section" id="premium">
+
+<div class="premium-banner">
+
+<h2>⚡ QuickTools Premium</h2>
+
+<p>
+Unlock professional tools with secure payments through Flutterwave.
+</p>
+
+<div class="plans">
+
+<div class="plan-card">
+<strong>₦2,500</strong>
+<small>Monthly • 30 days</small>
+<button onclick="buyPremium('monthly')">
+Get Monthly
+</button>
+</div>
+
+<div class="plan-card">
+<strong>₦20,000</strong>
+<small>Yearly • 365 days</small>
+<button onclick="buyPremium('yearly')">
+Get Yearly
+</button>
+</div>
+
+<div class="plan-card">
+<strong>₦50,000</strong>
+<small>Lifetime • Forever</small>
+<button onclick="buyPremium('lifetime')">
+Get Lifetime
+</button>
+</div>
+
+</div>
+
+<div class="premium-status" id="premiumStatus">
+Checking Premium status...
+</div>
+
+</div>
+</section>
+
+
+<div class="categories">
+
+<button class="cat-btn active" onclick="filterTools('all',this)">
+All
+</button>
+
+<button class="cat-btn" onclick="filterTools('calculator',this)">
+Calculators
+</button>
+
+<button class="cat-btn" onclick="filterTools('text',this)">
+Text
+</button>
+
+<button class="cat-btn" onclick="filterTools('converter',this)">
+Converters
+</button>
+
+<button class="cat-btn" onclick="filterTools('generator',this)">
+Generators
+</button>
+
+<button class="cat-btn" onclick="filterTools('date',this)">
+Date & Time
+</button>
+
+</div>
+
+
+<section class="tools-grid" id="toolsGrid">
+
+
+<!-- CALCULATOR -->
+
+<div class="tool-card"
+data-category="calculator"
+data-name="calculator basic calculator">
+
+<div class="tool-icon">🧮</div>
+
+<h3>Calculator</h3>
+
+<p>Perform normal mathematical calculations.</p>
+
+<button class="open-btn" onclick="toggleTool(this)">
+Open Calculator
+</button>
+
+<div class="tool-panel">
+
+<div class="field">
+<input id="calcDisplay" readonly placeholder="0">
+</div>
+
+<div style="display:grid;grid-template-columns:repeat(4,1fr);gap:6px;">
+
+<button class="action" onclick="calcInput('7')">7</button>
+<button class="action" onclick="calcInput('8')">8</button>
+<button class="action" onclick="calcInput('9')">9</button>
+<button class="action" onclick="calcInput('/')">÷</button>
+
+<button class="action" onclick="calcInput('4')">4</button>
+<button class="action" onclick="calcInput('5')">5</button>
+<button class="action" onclick="calcInput('6')">6</button>
+<button class="action" onclick="calcInput('*')">×</button>
+
+<button class="action" onclick="calcInput('1')">1</button>
+<button class="action" onclick="calcInput('2')">2</button>
+<button class="action" onclick="calcInput('3')">3</button>
+<button class="action" onclick="calcInput('-')">−</button>
+
+<button class="action" onclick="calcInput('0')">0</button>
+<button class="action" onclick="calcInput('.')">.</button>
+<button class="action" onclick="calculate()">=</button>
+<button class="action" onclick="calcInput('+')">+</button>
+
+</div>
+
+<button class="action secondary" onclick="clearCalc()">
+Clear
+</button>
+
+</div>
+</div>
+
+
+<!-- PERCENTAGE -->
+
+<div class="tool-card"
+data-category="calculator"
+data-name="percentage percentage calculator">
+
+<div class="tool-icon">%</div>
+
+<h3>Percentage Calculator</h3>
+
+<p>Calculate percentages quickly.</p>
+
+<button class="open-btn" onclick="toggleTool(this)">
+Open Tool
+</button>
+
+<div class="tool-panel">
+
+<div class="field">
+<label>Percentage</label>
+<input type="number" id="percentA">
+</div>
+
+<div class="field">
+<label>Number</label>
+<input type="number" id="percentB">
+</div>
+
+<button class="action" onclick="percentage()">
+Calculate
+</button>
+
+<div class="result" id="percentResult"></div>
+
+</div>
+</div>
+
+
+<!-- AGE -->
+
+<div class="tool-card"
+data-category="calculator"
+data-name="age age calculator">
+
+<div class="tool-icon">🎂</div>
+
+<h3>Age Calculator</h3>
+
+<p>Calculate your exact age.</p>
+
+<button class="open-btn" onclick="toggleTool(this)">
+Open Tool
+</button>
+
+<div class="tool-panel">
+
+<div class="field">
+<label>Date of birth</label>
+<input type="date" id="dob">
+</div>
+
+<button class="action" onclick="ageCalc()">
+Calculate Age
+</button>
+
+<div class="result" id="ageResult"></div>
+
+</div>
+</div>
+
+
+<!-- BMI -->
+
+<div class="tool-card"
+data-category="calculator"
+data-name="bmi body mass index">
+
+<div class="tool-icon">⚖️</div>
+
+<h3>BMI Calculator</h3>
+
+<p>Calculate your body mass index.</p>
+
+<button class="open-btn" onclick="toggleTool(this)">
+Open Tool
+</button>
+
+<div class="tool-panel">
+
+<div class="field">
+<label>Weight (kg)</label>
+<input type="number" id="bmiWeight">
+</div>
+
+<div class="field">
+<label>Height (cm)</label>
+<input type="number" id="bmiHeight">
+</div>
+
+<button class="action" onclick="bmiCalc()">
+Calculate BMI
+</button>
+
+<div class="result" id="bmiResult"></div>
+
+</div>
+</div>
+
+
+<!-- LOAN -->
+
+<div class="tool-card"
+data-category="calculator"
+data-name="loan loan calculator">
+
+<div class="tool-icon">💰</div>
+
+<h3>Loan Calculator</h3>
+
+<p>Estimate monthly loan payments.</p>
+
+<button class="open-btn" onclick="toggleTool(this)">
+Open Tool
+</button>
+
+<div class="tool-panel">
+
+<div class="field">
+<label>Loan amount</label>
+<input type="number" id="loanAmount">
+</div>
+
+<div class="field">
+<label>Annual interest (%)</label>
+<input type="number" id="loanRate">
+</div>
+
+<div class="field">
+<label>Term (months)</label>
+<input type="number" id="loanMonths">
+</div>
+
+<button class="action" onclick="loanCalc()">
+Calculate
+</button>
+
+<div class="result" id="loanResult"></div>
+
+</div>
+</div>
+
+
+<!-- DISCOUNT -->
+
+<div class="tool-card"
+data-category="calculator"
+data-name="discount sale discount calculator">
+
+<div class="tool-icon">🏷️</div>
+
+<h3>Discount Calculator</h3>
+
+<p>Find sale prices and savings.</p>
+
+<button class="open-btn" onclick="toggleTool(this)">
+Open Tool
+</button>
+
+<div class="tool-panel">
+
+<div class="field">
+<label>Original price</label>
+<input type="number" id="discountPrice">
+</div>
+
+<div class="field">
+<label>Discount (%)</label>
+<input type="number" id="discountPercent">
+</div>
+
+<button class="action" onclick="discountCalc()">
+Calculate
+</button>
+
+<div class="result" id="discountResult"></div>
+
+</div>
+</div>
+
+
+<!-- COMPOUND -->
+
+<div class="tool-card"
+data-category="calculator"
+data-name="compound interest">
+
+<div class="tool-icon">📈</div>
+
+<h3>Compound Interest</h3>
+
+<p>Calculate compound investment growth.</p>
+
+<button class="open-btn" onclick="toggleTool(this)">
+Open Tool
+</button>
+
+<div class="tool-panel">
+
+<div class="field">
+<label>Principal</label>
+<input type="number" id="compoundP">
+</div>
+
+<div class="field">
+<label>Annual rate (%)</label>
+<input type="number" id="compoundR">
+</div>
+
+<div class="field">
+<label>Years</label>
+<input type="number" id="compoundT">
+</div>
+
+<div class="field">
+<label>Compounds per year</label>
+<input type="number" id="compoundN" value="12">
+</div>
+
+<button class="action" onclick="compoundCalc()">
+Calculate
+</button>
+
+<div class="result" id="compoundResult"></div>
+
+</div>
+</div>
+
+
+<!-- TIP -->
+
+<div class="tool-card"
+data-category="calculator"
+data-name="tip bill splitter">
+
+<div class="tool-icon">🍽️</div>
+
+<h3>Tip & Bill Splitter</h3>
+
+<p>Split bills and calculate tips.</p>
+
+<button class="open-btn" onclick="toggleTool(this)">
+Open Tool
+</button>
+
+<div class="tool-panel">
+
+<div class="field">
+<label>Bill amount</label>
+<input type="number" id="billAmount">
+</div>
+
+<div class="field">
+<label>Tip (%)</label>
+<input type="number" id="tipPercent" value="10">
+</div>
+
+<div class="field">
+<label>People</label>
+<input type="number" id="people" value="1">
+</div>
+
+<button class="action" onclick="tipCalc()">
+Calculate
+</button>
+
+<div class="result" id="tipResult"></div>
+
+</div>
+</div>
+
+
+<!-- TEXT ANALYZER -->
+
+<div class="tool-card"
+data-category="text"
+data-name="text analyzer words characters">
+
+<div class="tool-icon">📝</div>
+
+<h3>Text Analyzer</h3>
+
+<p>Count words, characters and lines.</p>
+
+<button class="open-btn" onclick="toggleTool(this)">
+Open Tool
+</button>
+
+<div class="tool-panel">
+
+<textarea id="analyzeText"
+oninput="analyzeTextTool()"></textarea>
+
+<div class="result" id="analyzeResult">
+Words: 0 | Characters: 0 | Lines: 0
+</div>
+
+</div>
+</div>
+
+
+<!-- CASE -->
+
+<div class="tool-card"
+data-category="text"
+data-name="case converter uppercase lowercase">
+
+<div class="tool-icon">🔤</div>
+
+<h3>Case Converter</h3>
+
+<p>Convert text to upper, lower or title case.</p>
+
+<button class="open-btn" onclick="toggleTool(this)">
+Open Tool
+</button>
+
+<div class="tool-panel">
+
+<textarea id="caseText"></textarea>
+
+<button class="action" onclick="changeCase('upper')">
+UPPERCASE
+</button>
+
+<button class="action secondary" onclick="changeCase('lower')">
+lowercase
+</button>
+
+<button class="action secondary" onclick="changeCase('title')">
+Title Case
+</button>
+
+</div>
+</div>
+
+
+<!-- DUPLICATES -->
+
+<div class="tool-card"
+data-category="text"
+data-name="duplicate lines remover">
+
+<div class="tool-icon">🧹</div>
+
+<h3>Remove Duplicate Lines</h3>
+
+<p>Remove repeated lines from text.</p>
+
+<button class="open-btn" onclick="toggleTool(this)">
+Open Tool
+</button>
+
+<div class="tool-panel">
+
+<textarea id="duplicateText"></textarea>
+
+<button class="action" onclick="removeDuplicates()">
+Remove Duplicates
+</button>
+
+</div>
+</div>
+
+
+<!-- UNIT -->
+
+<div class="tool-card"
+data-category="converter"
+data-name="unit converter length weight">
+
+<div class="tool-icon">📏</div>
+
+<h3>Unit Converter</h3>
+
+<p>Convert common units of length and weight.</p>
+
+<button class="open-btn" onclick="toggleTool(this)">
+Open Tool
+</button>
+
+<div class="tool-panel">
+
+<div class="field">
+<label>Value</label>
+<input type="number" id="unitValue">
+</div>
+
+<div class="field">
+<label>From</label>
+
+<select id="unitFrom">
+<option value="m">Meters</option>
+<option value="km">Kilometers</option>
+<option value="cm">Centimeters</option>
+<option value="ft">Feet</option>
+<option value="in">Inches</option>
+<option value="kg">Kilograms</option>
+<option value="g">Grams</option>
+<option value="lb">Pounds</option>
+</select>
+
+</div>
+
+<div class="field">
+<label>To</label>
+
+<select id="unitTo">
+<option value="m">Meters</option>
+<option value="km">Kilometers</option>
+<option value="cm">Centimeters</option>
+<option value="ft">Feet</option>
+<option value="in">Inches</option>
+<option value="kg">Kilograms</option>
+<option value="g">Grams</option>
+<option value="lb">Pounds</option>
+</select>
+
+</div>
+
+<button class="action" onclick="unitConvert()">
+Convert
+</button>
+
+<div class="result" id="unitResult"></div>
+
+</div>
+</div>
+
+
+<!-- CURRENCY -->
+
+<div class="tool-card"
+data-category="converter"
+data-name="currency converter naira dollar euro">
+
+<div class="tool-icon">💱</div>
+
+<h3>Currency Calculator</h3>
+
+<p>Calculate currency values using rates you provide.</p>
+
+<button class="open-btn" onclick="toggleTool(this)">
+Open Tool
+</button>
+
+<div class="tool-panel">
+
+<div class="field">
+<label>Amount</label>
+<input type="number" id="currencyAmount">
+</div>
+
+<div class="field">
+<label>Exchange rate</label>
+<input type="number" id="currencyRate" placeholder="Example: 1500">
+</div>
+
+<button class="action" onclick="currencyCalc()">
+Calculate
+</button>
+
+<div class="result" id="currencyResult"></div>
+
+</div>
+</div>
+
+
+<!-- PASSWORD -->
+
+<div class="tool-card"
+data-category="generator"
+data-name="password generator secure password">
+
+<div class="tool-icon">🔐</div>
+
+<h3>Password Generator</h3>
+
+<p>Generate strong random passwords.</p>
+
+<button class="open-btn" onclick="toggleTool(this)">
+Open Tool
+</button>
+
+<div class="tool-panel">
+
+<div class="field">
+<label>Password length</label>
+<input type="number" id="passwordLength" value="16" min="4" max="100">
+</div>
+
+<button class="action" onclick="generatePassword()">
+Generate
+</button>
+
+<div class="result" id="passwordResult"></div>
+
+</div>
+</div>
+
+
+<!-- NUMBER -->
+
+<div class="tool-card"
+data-category="calculator"
+data-name="number checker even odd prime">
+
+<div class="tool-icon">🔢</div>
+
+<h3>Number Checker</h3>
+
+<p>Check if a number is even, odd or prime.</p>
+
+<button class="open-btn" onclick="toggleTool(this)">
+Open Tool
+</button>
+
+<div class="tool-panel">
+
+<div class="field">
+<input type="number" id="numberCheck">
+</div>
+
+<button class="action" onclick="numberChecker()">
+Check
+</button>
+
+<div class="result" id="numberResult"></div>
+
+</div>
+</div>
+
+
+<!-- RANDOM -->
+
+<div class="tool-card"
+data-category="generator"
+data-name="random number generator">
+
+<div class="tool-icon">🎲</div>
+
+<h3>Random Number</h3>
+
+<p>Generate a random number between two values.</p>
+
+<button class="open-btn" onclick="toggleTool(this)">
+Open Tool
+</button>
+
+<div class="tool-panel">
+
+<div class="field">
+<label>Minimum</label>
+<input type="number" id="randomMin" value="1">
+</div>
+
+<div class="field">
+<label>Maximum</label>
+<input type="number" id="randomMax" value="100">
+</div>
+
+<button class="action" onclick="randomNumber()">
+Generate
+</button>
+
+<div class="result" id="randomResult"></div>
+
+</div>
+</div>
+
+
+<!-- COUNTDOWN -->
+
+<div class="tool-card"
+data-category="date"
+data-name="countdown timer">
+
+<div class="tool-icon">⏱️</div>
+
+<h3>Countdown Timer</h3>
+
+<p>Run a simple countdown timer.</p>
+
+<button class="open-btn" onclick="toggleTool(this)">
+Open Tool
+</button>
+
+<div class="tool-panel">
+
+<div class="field">
+<label>Seconds</label>
+<input type="number" id="timerSeconds" value="60">
+</div>
+
+<button class="action" onclick="startTimer()">
+Start
+</button>
+
+<button class="action secondary" onclick="stopTimer()">
+Stop
+</button>
+
+<div class="result" id="timerResult">
+00:00
+</div>
+
+</div>
+</div>
+
+
+<!-- DATE DIFFERENCE -->
+
+<div class="tool-card"
+data-category="date"
+data-name="date difference days">
+
+<div class="tool-icon">📅</div>
+
+<h3>Date Difference</h3>
+
+<p>Find the number of days between two dates.</p>
+
+<button class="open-btn" onclick="toggleTool(this)">
+Open Tool
+</button>
+
+<div class="tool-panel">
+
+<div class="field">
+<label>Start date</label>
+<input type="date" id="dateOne">
+</div>
+
+<div class="field">
+<label>End date</label>
+<input type="date" id="dateTwo">
+</div>
+
+<button class="action" onclick="dateDifference()">
+Calculate
+</button>
+
+<div class="result" id="dateResult"></div>
+
+</div>
+</div>
+
+
+<!-- GPA -->
+
+<div class="tool-card"
+data-category="calculator"
+data-name="gpa cgpa calculator">
+
+<div class="tool-icon">🎓</div>
+
+<h3>GPA Calculator</h3>
+
+<p>Calculate GPA from total grade points and credits.</p>
+
+<button class="open-btn" onclick="toggleTool(this)">
+Open Tool
+</button>
+
+<div class="tool-panel">
+
+<div class="field">
+<label>Total grade points</label>
+<input type="number" id="gpaPoints">
+</div>
+
+<div class="field">
+<label>Total credit units</label>
+<input type="number" id="gpaCredits">
+</div>
+
+<button class="action" onclick="gpaCalc()">
+Calculate GPA
+</button>
+
+<div class="result" id="gpaResult"></div>
+
+</div>
+</div>
+
+
+<!-- PREMIUM INVOICE -->
+
+<div class="tool-card"
+data-category="generator"
+data-name="invoice generator premium invoice"
+data-premium="true">
+
+<div class="tool-icon">🧾</div>
+
+<h3>
+Invoice Generator
+<span class="premium-lock">PRO</span>
+</h3>
+
+<p>Create professional invoices for your customers.</p>
+
+<button class="open-btn" onclick="openPremiumTool(this)">
+Open Premium Tool
+</button>
+
+<div class="tool-panel">
+
+<div class="field">
+<label>Business name</label>
+<input id="invoiceBusiness" placeholder="Your business">
+</div>
+
+<div class="field">
+<label>Customer name</label>
+<input id="invoiceCustomer" placeholder="Customer">
+</div>
+
+<div class="field">
+<label>Item / service</label>
+<input id="invoiceItem" placeholder="Service">
+</div>
+
+<div class="field">
+<label>Amount (₦)</label>
+<input type="number" id="invoiceAmount" placeholder="25000">
+</div>
+
+<button class="action" onclick="generateInvoice()">
+Generate Invoice
+</button>
+
+<div class="result" id="invoiceResult"></div>
+
+</div>
+</div>
+
+
+</section>
+
+</main>
+
+
+<footer class="footer">
+
+<div class="logo">⚡ QuickTools</div>
+
+<div class="footer-links">
+
+<a href="About.html">About</a>
+<a href="Privacy.html">Privacy</a>
+<a href="Terms.html">Terms</a>
+<a href="Contact.html">Contact</a>
+<a href="Admin.html">Admin</a>
+
+</div>
+
+<div class="copyright">
+© <span id="year"></span> QuickTools. All rights reserved.
+</div>
+
+</footer>
+
+
+<!-- ACCOUNT MODAL -->
+
+<div class="modal-overlay" id="accountModal">
+
+<div class="modal">
+
+<button class="close" onclick="closeAccount()">×</button>
+
+
+<div id="authSection">
+
+<h2 id="authTitle">Create your account</h2>
+
+<p class="modal-subtitle" id="authSubtitle">
+Sign up with your Gmail or email address.
+</p>
+
+<div class="auth-tabs">
+
+<button class="auth-tab active"
+id="signupTab"
+onclick="showSignup()">
+Sign Up
+</button>
+
+<button class="auth-tab"
+id="signinTab"
+onclick="showSignin()">
+Sign In
+</button>
+
+</div>
+
+<div id="authMessage" class="auth-message"></div>
+
+
+<div id="nameField" class="field">
+
+<label>Full name</label>
+
+<input
+type="text"
+id="authName"
+placeholder="Your name">
+
+</div>
+
+
+<div class="field">
+
+<label>Email address</label>
+
+<input
+type="email"
+id="authEmail"
+placeholder="you@gmail.com">
+
+</div>
+
+
+<div class="field">
+
+<label>Password</label>
+
+<input
+type="password"
+id="authPassword"
+placeholder="Minimum 6 characters">
+
+</div>
+
+
+<div id="confirmPasswordField" class="field">
+
+<label>Confirm password</label>
+
+<input
+type="password"
+id="authConfirmPassword"
+placeholder="Confirm password">
+
+</div>
+
+
+<span class="forgot"
+id="forgotBtn"
+onclick="forgotPassword()">
+Forgot password?
+</span>
+
+
+<button
+class="action"
+id="authSubmit"
+onclick="submitAuth()">
+Create Account
+</button>
+
+
+<button
+class="action secondary"
+onclick="continueAsGuest()">
+Continue as Guest
+</button>
+
+</div>
+
+
+<div id="accountSection" class="account-panel">
+
+<h2 style="text-align:center;">
+My Account
+</h2>
+
+<p class="modal-subtitle" style="text-align:center;">
+Your QuickTools account
+</p>
+
+
+<div class="account-avatar" id="accountAvatar">
+Q
+</div>
+
+
+<div class="account-info">
+
+<strong id="accountName">
+User
+</strong>
+
+<span id="accountEmail"></span>
+
+</div>
+
+
+<div class="account-actions">
+
+<button class="action" onclick="openSettings()">
+⚙️ Account Settings
+</button>
+
+<button class="action secondary" onclick="refreshSession()">
+🔄 Refresh Account
+</button>
+
+<button class="action danger" onclick="logout()">
+Sign Out
+</button>
+
+</div>
+
+
+<div id="settingsSection"
+class="settings-section hidden">
+
+<h3>Account Settings</h3>
+
+
+<div class="settings-row">
+
+<div>
+<strong>Dark Mode</strong><br>
+<span>Change website appearance</span>
+</div>
+
+<button
+class="toggle"
+id="accountThemeToggle"
+onclick="toggleThemeFromAccount()">
+</button>
+
+</div>
+
+
+<div class="settings-row">
+
+<div>
+<strong>Email</strong><br>
+<span id="settingsEmail"></span>
+</div>
+
+</div>
+
+
+<button
+class="action secondary"
+onclick="closeSettings()">
+Close Settings
+</button>
+
+</div>
+
+</div>
+
+</div>
+</div>
+
+
+<script>
+
+/* =========================================================
+SUPABASE
+========================================================= */
+
+const SUPABASE_URL =
+"https://vabrpwyjsowbgzoktxvy.supabase.co";
+
+const SUPABASE_KEY =
+"sb_publishable_AJ5Wbwx4q2yAkaaZUl-bvg_dTDNYDbP";
+
+const supabaseClient =
+window.supabase.createClient(
+SUPABASE_URL,
+SUPABASE_KEY
+);
+
+
+/* =========================================================
+PREMIUM STATE
+========================================================= */
+
+let quickToolsPremium = false;
+
+
+/* =========================================================
+PREMIUM STATUS
+========================================================= */
+
+async function loadPremiumStatus(){
+
+const el =
+document.getElementById("premiumStatus");
+
+if(!el)return;
+
+try{
+
+const {data:sessionData} =
+await supabaseClient.auth.getSession();
+
+if(!sessionData?.session){
+
+quickToolsPremium=false;
+
+el.textContent =
+"Sign in to purchase or use Premium tools.";
+
+return;
+}
+
+
+const {data,error} =
+await supabaseClient.functions.invoke(
+"quicktools-payments",
+{
+body:{
+action:"status"
+}
+}
+);
+
+
+if(error){
+
+console.error(error);
+
+el.textContent =
+"Premium status unavailable. Please try again.";
+
+return;
+}
+
+
+quickToolsPremium =
+!!(
+data?.plan &&
+data.plan !== "free" &&
+data.status === "active"
+);
+
+
+if(quickToolsPremium){
+
+el.textContent =
+"✓ Premium active: " +
+String(data.plan).toUpperCase() +
+(
+data.expires_at
+?
+" • expires " +
+new Date(
+data.expires_at
+).toLocaleDateString()
+:
+" • Lifetime"
+);
+
+}else{
+
+el.textContent =
+"Free plan active. Upgrade to unlock Premium tools.";
+
+}
+
+}catch(error){
+
+console.error(error);
+
+el.textContent =
+"Unable to check Premium status.";
+
+}
+
+}
+
+
+/* =========================================================
+BUY PREMIUM
+========================================================= */
+
+async function buyPremium(plan){
+
+try{
+
+const {data:sessionData} =
+await supabaseClient.auth.getSession();
+
+
+if(!sessionData?.session){
+
+openAccount();
+
+showAuthMessage(
+"Please sign in or create an account before purchasing Premium.",
+"error"
+);
+
+return;
+}
+
+
+const labels={
+
+monthly:"₦2,500/month",
+
+yearly:"₦20,000/year",
+
+lifetime:"₦50,000 lifetime"
+
+};
+
+
+if(
+!confirm(
+"Continue to Flutterwave checkout for " +
+labels[plan] +
+"?")
+){
+
+return;
+}
+
+
+const {data,error} =
+await supabaseClient.functions.invoke(
+"quicktools-payments",
+{
+body:{
+action:"initiate",
+plan:plan
+}
+}
+);
+
+
+if(
+error ||
+!data?.checkout_url
+){
+
+alert(
+data?.error ||
+error?.message ||
+"Could not start payment."
+);
+
+return;
+}
+
+
+window.location.href =
+data.checkout_url;
+
+
+}catch(error){
+
+console.error(error);
+
+alert(
+"Payment could not be started."
+);
+
+}
+
+}
+
+
+/* =========================================================
+FLUTTERWAVE RETURN
+========================================================= */
+
+async function verifyFlutterwaveReturn(){
+
+const params =
+new URLSearchParams(
+window.location.search
+);
+
+const status =
+params.get("status");
+
+const reference =
+params.get("tx_ref");
+
+const transactionId =
+params.get("transaction_id");
+
+
+if(
+!reference ||
+!transactionId ||
+status !== "successful"
+){
+
+return;
+}
+
+
+const {data:sessionData} =
+await supabaseClient.auth.getSession();
+
+
+if(!sessionData?.session){
+
+alert(
+"Payment returned successfully. Please sign in to verify your Premium account."
+);
+
+return;
+}
+
+
+const {data,error} =
+await supabaseClient.functions.invoke(
+"quicktools-payments",
+{
+body:{
+action:"verify",
+reference:reference,
+transaction_id:transactionId
+}
+}
+);
+
+
+if(
+!error &&
+data?.success
+){
+
+alert(
+"Payment successful! Your QuickTools Premium access is now active."
+);
+
+
+history.replaceState(
+{},
+document.title,
+window.location.pathname
+);
+
+
+await loadPremiumStatus();
+
+}else{
+
+alert(
+data?.error ||
+error?.message ||
+"Payment verification failed."
+);
+
+}
+
+}
+
+
+/* =========================================================
+PREMIUM TOOL
+========================================================= */
+
+function openPremiumTool(button){
+
+if(!quickToolsPremium){
+
+document
+.getElementById("premium")
+?.scrollIntoView({
+behavior:"smooth"
+});
+
+alert(
+"This is a Premium tool. Upgrade your QuickTools account to unlock it."
+);
+
+return;
+}
+
+toggleTool(button);
+
+}
+
+
+/* =========================================================
+INVOICE
+========================================================= */
+
+function generateInvoice(){
+
+if(!quickToolsPremium){
+
+alert(
+"Upgrade to QuickTools Premium first."
+);
+
+return;
+}
+
+
+const business =
+document
+.getElementById("invoiceBusiness")
+.value
+.trim();
+
+const customer =
+document
+.getElementById("invoiceCustomer")
+.value
+.trim();
+
+const item =
+document
+.getElementById("invoiceItem")
+.value
+.trim();
+
+const amount =
+Number(
+document
+.getElementById("invoiceAmount")
+.value
+);
+
+
+if(
+!business ||
+!customer ||
+!item ||
+!amount ||
+amount<=0
+){
+
+showResult(
+"invoiceResult",
+"Complete all invoice fields."
+);
+
+return;
+}
+
+
+const invoiceNo =
+"QT-" +
+Date.now()
+.toString()
+.slice(-8);
+
+
+const invoiceHtml = `<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>Invoice ${invoiceNo}</title>
+
+<style>
+
+body{
+font-family:Arial,Helvetica,sans-serif;
+padding:40px;
+max-width:800px;
+margin:auto;
+color:#222
+}
+
+h1{
+color:#5b4be7
+}
+
+.row{
+display:flex;
+justify-content:space-between;
+margin:12px 0
+}
+
+.total{
+font-size:22px;
+font-weight:800;
+border-top:2px solid #ddd;
+padding-top:15px
+}
+
+</style>
+</head>
+
+<body>
+
+<h1>INVOICE</h1>
+
+<div class="row">
+<strong>Business:</strong>
+<span>${escapeHtml(business)}</span>
+</div>
+
+<div class="row">
+<strong>Invoice:</strong>
+<span>${invoiceNo}</span>
+</div>
+
+<div class="row">
+<strong>Customer:</strong>
+<span>${escapeHtml(customer)}</span>
+</div>
+
+<hr>
+
+<div class="row">
+<span>${escapeHtml(item)}</span>
+<strong>₦${amount.toLocaleString()}</strong>
+</div>
+
+<div class="row total">
+<span>Total</span>
+<span>₦${amount.toLocaleString()}</span>
+</div>
+
+<p>Generated by QuickTools Premium.</p>
+
+</body>
+</html>`;
+
+
+const blob =
+new Blob(
+[invoiceHtml],
+{type:"text/html"}
+);
+
+const url =
+URL.createObjectURL(blob);
+
+const a =
+document.createElement("a");
+
+a.href=url;
+
+a.download =
+invoiceNo+".html";
+
+a.click();
+
+URL.revokeObjectURL(url);
+
+
+showResult(
+"invoiceResult",
+"Invoice generated and downloaded."
+);
+
+}
+
+
+function escapeHtml(value){
+
+return value.replace(
+/[&<>"']/g,
+char=>({
+"&":"&amp;",
+"<":"&lt;",
+">":"&gt;",
+'"':"&quot;",
+"'":"&#039;"
+}[char])
+);
+
+}
+
+
+/* =========================================================
+GENERAL
+========================================================= */
+
+document.getElementById("year").textContent =
+new Date().getFullYear();
+
+
+function scrollToTools(){
+
+document
+.getElementById("toolsGrid")
+.scrollIntoView({
+behavior:"smooth"
+});
+
+}
+
+
+function toggleTool(button){
+
+const panel =
+button.nextElementSibling;
+
+
+document
+.querySelectorAll(".tool-panel")
+.forEach(p=>{
+
+if(p!==panel)
+p.classList.remove("show");
+
+});
+
+
+panel.classList.toggle("show");
+
+
+button.textContent =
+panel.classList.contains("show")
+?
+"Close Tool"
+:
+"Open Tool";
+
+}
+
+
+/* =========================================================
+SEARCH
+========================================================= */
+
+function searchTools(){
+
+const query =
+document
+.getElementById("searchInput")
+.value
+.toLowerCase()
+.trim();
+
+
+document
+.querySelectorAll(".tool-card")
+.forEach(card=>{
+
+const name =
+card.dataset.name.toLowerCase();
+
+card.style.display =
+!query || name.includes(query)
+?
+""
+:
+"none";
+
+});
+
+}
+
+
+/* =========================================================
+FILTER
+========================================================= */
+
+function filterTools(category,button){
+
+document
+.querySelectorAll(".cat-btn")
+.forEach(btn=>{
+btn.classList.remove("active");
+});
+
+
+button.classList.add("active");
+
+
+document
+.querySelectorAll(".tool-card")
+.forEach(card=>{
+
+card.style.display =
+category==="all" ||
+card.dataset.category===category
+?
+""
+:
+"none";
+
+});
+
+
+document.getElementById("searchInput").value="";
+
+}
+
+
+/* =========================================================
+THEME
+========================================================= */
+
+function applyTheme(){
+
+const dark =
+localStorage.getItem("quicktools_theme")
+==="dark";
+
+
+document.body.classList.toggle(
+"dark",
+dark
+);
+
+
+document.getElementById("themeBtn").textContent =
+dark
+?
+"☀️"
+:
+"🌙";
+
+
+const toggle =
+document.getElementById(
+"accountThemeToggle"
+);
+
+if(toggle){
+
+toggle.classList.toggle(
+"on",
+dark
+);
+
+}
+
+}
+
+
+function toggleTheme(){
+
+const dark =
+document.body.classList.toggle("dark");
+
+
+localStorage.setItem(
+"quicktools_theme",
+dark
+?
+"dark"
+:
+"light"
+);
+
+
+document.getElementById("themeBtn").textContent =
+dark
+?
+"☀️"
+:
+"🌙";
+
+
+const toggle =
+document.getElementById(
+"accountThemeToggle"
+);
+
+if(toggle){
+
+toggle.classList.toggle(
+"on",
+dark
+);
+
+}
+
+}
+
+
+function toggleThemeFromAccount(){
+
+toggleTheme();
+
+}
+
+
+/* =========================================================
+CALCULATOR
+========================================================= */
+
+function calcInput(value){
+
+document
+.getElementById("calcDisplay")
+.value += value;
+
+}
+
+
+function clearCalc(){
+
+document
+.getElementById("calcDisplay")
+.value="";
+
+}
+
+
+function calculate(){
+
+const display =
+document.getElementById("calcDisplay");
+
+try{
+
+const expression =
+display.value;
+
+
+if(
+!/^[0-9+\-*/().\s]+$/.test(expression)
+){
+
+throw new Error();
+
+}
+
+
+const result =
+Function(
+'"use strict";return('+
+expression+
+')'
+)();
+
+
+display.value =
+Number.isFinite(result)
+?
+result
+:
+"Error";
+
+}catch{
+
+display.value="Error";
+
+}
+
+}
+
+
+/* =========================================================
+PERCENTAGE
+========================================================= */
+
+function percentage(){
+
+const a =
+parseFloat(
+document.getElementById("percentA").value
+);
+
+const b =
+parseFloat(
+document.getElementById("percentB").value
+);
+
+
+if(
+isNaN(a) ||
+isNaN(b)
+){
+
+return showResult(
+"percentResult",
+"Enter both values."
+);
+
+}
+
+
+showResult(
+"percentResult",
+`${a}% of ${b} = ${(a/100)*b}`
+);
+
+}
+
+
+/* =========================================================
+AGE
+========================================================= */
+
+function ageCalc(){
+
+const value =
+document
+.getElementById("dob")
+.value;
+
+
+if(!value){
+
+return showResult(
+"ageResult",
+"Enter your date of birth."
+);
+
+}
+
+
+const dob =
+new Date(value);
+
+const now =
+new Date();
+
+
+let age =
+now.getFullYear() -
+dob.getFullYear();
+
+
+const month =
+now.getMonth() -
+dob.getMonth();
+
+
+if(
+month<0 ||
+(
+month===0 &&
+now.getDate()<dob.getDate()
+)
+){
+
+age--;
+
+}
+
+
+showResult(
+"ageResult",
+`You are ${age} years old.`
+);
+
+}
+
+
+/* =========================================================
+BMI
+========================================================= */
+
+function bmiCalc(){
+
+const weight =
+parseFloat(
+document.getElementById("bmiWeight").value
+);
+
+const height =
+parseFloat(
+document.getElementById("bmiHeight").value
+);
+
+
+if(!weight || !height){
+
+return showResult(
+"bmiResult",
+"Enter your weight and height."
+);
+
+}
+
+
+const meters =
+height/100;
+
+
+const bmi =
+weight/
+(meters*meters);
+
+
+let status="";
+
+
+if(bmi<18.5)
+status="Underweight";
+
+else if(bmi<25)
+status="Normal range";
+
+else if(bmi<30)
+status="Overweight";
+
+else
+status="Obesity range";
+
+
+showResult(
+"bmiResult",
+`BMI: ${bmi.toFixed(2)} — ${status}`
+);
+
+}
+
+
+/* =========================================================
+LOAN
+========================================================= */
+
+function loanCalc(){
+
+const principal =
+parseFloat(
+document.getElementById("loanAmount").value
+);
+
+const annualRate =
+parseFloat(
+document.getElementById("loanRate").value
+);
+
+const months =
+parseInt(
+document.getElementById("loanMonths").value
+);
+
+
+if(
+!principal ||
+!months
+){
+
+return showResult(
+"loanResult",
+"Enter the loan details."
+);
+
+}
+
+
+const monthlyRate =
+annualRate/100/12;
+
+
+let payment;
+
+
+if(monthlyRate===0){
+
+payment =
+principal/months;
+
+}else{
+
+payment =
+principal*
+monthlyRate*
+Math.pow(
+1+monthlyRate,
+months
+)/
+(
+Math.pow(
+1+monthlyRate,
+months
+)-1
+);
+
+}
+
+
+showResult(
+"loanResult",
+`Estimated monthly payment: ${payment.toFixed(2)}`
+);
+
+}
+
+
+/* =========================================================
+DISCOUNT
+========================================================= */
+
+function discountCalc(){
+
+const price =
+parseFloat(
+document.getElementById("discountPrice").value
+);
+
+const percent =
+parseFloat(
+document.getElementById("discountPercent").value
+);
+
+
+if(
+isNaN(price) ||
+isNaN(percent)
+){
+
+return showResult(
+"discountResult",
+"Enter both values."
+);
+
+}
+
+
+const saving =
+price*percent/100;
+
+
+const finalPrice =
+price-saving;
+
+
+showResult(
+"discountResult",
+`You save: ${saving.toFixed(2)} | Final price: ${finalPrice.toFixed(2)}`
+);
+
+}
+
+
+/* =========================================================
+COMPOUND
+========================================================= */
+
+function compoundCalc(){
+
+const P =
+parseFloat(
+document.getElementById("compoundP").value
+);
+
+const r =
+parseFloat(
+document.getElementById("compoundR").value
+)/100;
+
+const t =
+parseFloat(
+document.getElementById("compoundT").value
+);
+
+const n =
+parseFloat(
+document.getElementById("compoundN").value
+);
+
+
+if(
+!P ||
+!t ||
+!n
+){
+
+return showResult(
+"compoundResult",
+"Enter all values."
+);
+
+}
+
+
+const A =
+P*
+Math.pow(
+1+r/n,
+n*t
+);
+
+
+const interest =
+A-P;
+
+
+showResult(
+"compoundResult",
+`Final amount: ${A.toFixed(2)} | Interest: ${interest.toFixed(2)}`
+);
+
+}
+
+
+/* =========================================================
+TIP
+========================================================= */
+
+function tipCalc(){
+
+const bill =
+parseFloat(
+document.getElementById("billAmount").value
+);
+
+const percent =
+parseFloat(
+document.getElementById("tipPercent").value
+);
+
+const people =
+parseInt(
+document.getElementById("people").value
+);
+
+
+if(
+!bill ||
+!people
+){
+
+return showResult(
+"tipResult",
+"Enter the bill and number of people."
+);
+
+}
+
+
+const tip =
+bill*percent/100;
+
+const total =
+bill+tip;
+
+const each =
+total/people;
+
+
+showResult(
+"tipResult",
+`Tip: ${tip.toFixed(2)} | Total: ${total.toFixed(2)} | Each: ${each.toFixed(2)}`
+);
+
+}
+
+
+/* =========================================================
+TEXT ANALYZER
+========================================================= */
+
+function analyzeTextTool(){
+
+const text =
+document
+.getElementById("analyzeText")
+.value;
+
+
+const words =
+text.trim()
+?
+text.trim().split(/\s+/).length
+:
+0;
+
+
+const characters =
+text.length;
+
+
+const lines =
+text
+?
+text.split(/\r?\n/).length
+:
+0;
+
+
+document
+.getElementById("analyzeResult")
+.textContent =
+`Words: ${words} | Characters: ${characters} | Lines: ${lines}`;
+
+}
+
+
+/* =========================================================
+CASE
+========================================================= */
+
+function changeCase(type){
+
+const input =
+document.getElementById("caseText");
+
+
+let text =
+input.value;
+
+
+if(type==="upper")
+text=text.toUpperCase();
+
+
+if(type==="lower")
+text=text.toLowerCase();
+
+
+if(type==="title"){
+
+text =
+text
+.toLowerCase()
+.replace(
+/\b\w/g,
+char=>char.toUpperCase()
+);
+
+}
+
+
+input.value=text;
+
+}
+
+
+/* =========================================================
+DUPLICATES
+========================================================= */
+
+function removeDuplicates(){
+
+const input =
+document.getElementById(
+"duplicateText"
+);
+
+
+const lines =
+input.value.split(/\r?\n/);
+
+
+const unique =
+[...new Set(lines)];
+
+
+input.value =
+unique.join("\n");
+
+}
+
+
+/* =========================================================
+UNITS
+========================================================= */
+
+const unitBase={
+
+m:1,
+km:1000,
+cm:.01,
+ft:.3048,
+in:.0254,
+
+kg:1,
+g:.001,
+lb:.45359237
+
+};
+
+
+function unitConvert(){
+
+const value =
+parseFloat(
+document.getElementById(
+"unitValue"
+).value
+);
+
+const from =
+document.getElementById(
+"unitFrom"
+).value;
+
+const to =
+document.getElementById(
+"unitTo"
+).value;
+
+
+if(isNaN(value)){
+
+return showResult(
+"unitResult",
+"Enter a value."
+);
+
+}
+
+
+const result =
+value*
+unitBase[from]/
+unitBase[to];
+
+
+showResult(
+"unitResult",
+`${value} ${from} = ${result.toFixed(6)} ${to}`
+);
+
+}
+
+
+/* =========================================================
+CURRENCY
+========================================================= */
+
+function currencyCalc(){
+
+const amount =
+parseFloat(
+document.getElementById(
+"currencyAmount"
+).value
+);
+
+const rate =
+parseFloat(
+document.getElementById(
+"currencyRate"
+).value
+);
+
+
+if(
+isNaN(amount) ||
+isNaN(rate)
+){
+
+return showResult(
+"currencyResult",
+"Enter amount and exchange rate."
+);
+
+}
+
+
+showResult(
+"currencyResult",
+`Converted amount: ${(amount*rate).toLocaleString()}`
+);
+
+}
+
+
+/* =========================================================
+PASSWORD
+========================================================= */
+
+function generatePassword(){
+
+const length =
+parseInt(
+document.getElementById(
+"passwordLength"
+).value
+);
+
+
+if(
+length<4 ||
+length>100
+){
+
+return showResult(
+"passwordResult",
+"Length must be between 4 and 100."
+);
+
+}
+
+
+const chars =
+"ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*()_+-=";
+
+
+let password="";
+
+
+const randomArray =
+new Uint32Array(length);
+
+
+crypto.getRandomValues(
+randomArray
+);
+
+
+for(
+let i=0;
+i<length;
+i++
+){
+
+password +=
+chars[
+randomArray[i]%
+chars.length
+];
+
+}
+
+
+showResult(
+"passwordResult",
+password
+);
+
+}
+
+
+/* =========================================================
+NUMBER
+========================================================= */
+
+function numberChecker(){
+
+const n =
+parseInt(
+document.getElementById(
+"numberCheck"
+).value
+);
+
+
+if(isNaN(n)){
+
+return showResult(
+"numberResult",
+"Enter a number."
+);
+
+}
+
+
+let prime=true;
+
+
+if(n<2){
+
+prime=false;
+
+}else{
+
+for(
+let i=2;
+i<=Math.sqrt(n);
+i++
+){
+
+if(n%i===0){
+
+prime=false;
+break;
+
+}
+
+}
+
+}
+
+
+showResult(
+"numberResult",
+`${n} is ${n%2===0?"Even":"Odd"} and ${prime?"Prime":"Not Prime"}.`
+);
+
+}
+
+
+/* =========================================================
+RANDOM
+========================================================= */
+
+function randomNumber(){
+
+const min =
+parseInt(
+document.getElementById(
+"randomMin"
+).value
+);
+
+const max =
+parseInt(
+document.getElementById(
+"randomMax"
+).value
+);
+
+
+if(
+isNaN(min) ||
+isNaN(max) ||
+min>max
+){
+
+return showResult(
+"randomResult",
+"Enter a valid range."
+);
+
+}
+
+
+const result =
+Math.floor(
+Math.random()*
+(max-min+1)
+)+min;
+
+
+showResult(
+"randomResult",
+`Random number: ${result}`
+);
+
+}
+
+
+/* =========================================================
+TIMER
+========================================================= */
+
+let timerInterval=null;
+let remainingSeconds=0;
+
+
+function startTimer(){
+
+clearInterval(
+timerInterval
+);
+
+
+remainingSeconds =
+parseInt(
+document.getElementById(
+"timerSeconds"
+).value
+);
+
+
+if(
+isNaN(remainingSeconds) ||
+remainingSeconds<1
+){
+
+return;
+
+}
+
+
+updateTimer();
+
+
+timerInterval =
+setInterval(
+()=>{
+
+remainingSeconds--;
+
+updateTimer();
+
+
+if(
+remainingSeconds<=0
+){
+
+clearInterval(
+timerInterval
+);
+
+document
+.getElementById(
+"timerResult"
+).textContent =
+"Time's up!";
+
+}
+
+},
+1000
+);
+
+}
+
+
+function updateTimer(){
+
+const minutes =
+Math.floor(
+remainingSeconds/60
+);
+
+const seconds =
+remainingSeconds%60;
+
+
+document
+.getElementById(
+"timerResult"
+)
+.textContent =
+`${String(minutes).padStart(2,"0")}:${String(seconds).padStart(2,"0")}`;
+
+}
+
+
+function stopTimer(){
+
+clearInterval(
+timerInterval
+);
+
+}
+
+
+/* =========================================================
+DATE DIFFERENCE
+========================================================= */
+
+function dateDifference(){
+
+const one =
+new Date(
+document.getElementById(
+"dateOne"
+).value
+);
+
+const two =
+new Date(
+document.getElementById(
+"dateTwo"
+).value
+);
+
+
+if(
+isNaN(one) ||
+isNaN(two)
+){
+
+return showResult(
+"dateResult",
+"Select both dates."
+);
+
+}
+
+
+const difference =
+Math.abs(two-one);
+
+
+const days =
+Math.ceil(
+difference/
+(1000*60*60*24)
+);
+
+
+showResult(
+"dateResult",
+`${days} day${days===1?"":"s"}`
+);
+
+}
+
+
+/* =========================================================
+GPA
+========================================================= */
+
+function gpaCalc(){
+
+const points =
+parseFloat(
+document.getElementById(
+"gpaPoints"
+).value
+);
+
+const credits =
+parseFloat(
+document.getElementById(
+"gpaCredits"
+).value
+);
+
+
+if(
+!points ||
+!credits
+){
+
+return showResult(
+"gpaResult",
+"Enter both values."
+);
+
+}
+
+
+const gpa =
+points/credits;
+
+
+showResult(
+"gpaResult",
+`GPA: ${gpa.toFixed(2)}`
+);
+
+}
+
+
+/* =========================================================
+RESULT
+========================================================= */
+
+function showResult(id,message){
+
+const element =
+document.getElementById(id);
+
+if(element)
+element.textContent=message;
+
+}
+
+
+/* =========================================================
+ACCOUNT
+========================================================= */
+
+let authMode="signup";
+
+
+function openAccount(){
+
+document
+.getElementById(
+"accountModal"
+)
+.classList.add("show");
+
+
+checkSession();
+
+}
+
+
+function closeAccount(){
+
+document
+.getElementById(
+"accountModal"
+)
+.classList.remove("show");
+
+}
+
+
+function showSignup(){
+
+authMode="signup";
+
+
+document
+.getElementById("signupTab")
+.classList.add("active");
+
+document
+.getElementById("signinTab")
+.classList.remove("active");
+
+
+document
+.getElementById("authTitle")
+.textContent =
+"Create your account";
+
+
+document
+.getElementById("authSubtitle")
+.textContent =
+"Sign up with your Gmail or email address.";
+
+
+document
+.getElementById("nameField")
+.classList.remove("hidden");
+
+
+document
+.getElementById(
+"confirmPasswordField"
+)
+.classList.remove("hidden");
+
+
+document
+.getElementById("authSubmit")
+.textContent =
+"Create Account";
+
+
+clearAuthMessage();
+
+}
+
+
+function showSignin(){
+
+authMode="signin";
+
+
+document
+.getElementById("signinTab")
+.classList.add("active");
+
+document
+.getElementById("signupTab")
+.classList.remove("active");
+
+
+document
+.getElementById("authTitle")
+.textContent =
+"Welcome back";
+
+
+document
+.getElementById("authSubtitle")
+.textContent =
+"Sign in to your QuickTools account.";
+
+
+document
+.getElementById("nameField")
+.classList.add("hidden");
+
+
+document
+.getElementById(
+"confirmPasswordField"
+)
+.classList.add("hidden");
+
+
+document
+.getElementById("authSubmit")
+.textContent =
+"Sign In";
+
+
+clearAuthMessage();
+
+}
+
+
+/* =========================================================
+AUTH MESSAGE
+========================================================= */
+
+function showAuthMessage(message,type){
+
+const box =
+document.getElementById(
+"authMessage"
+);
+
+box.textContent=message;
+
+box.className =
+"auth-message "+type;
+
+}
+
+
+function clearAuthMessage(){
+
+const box =
+document.getElementById(
+"authMessage"
+);
+
+box.textContent="";
+
+box.className =
+"auth-message";
+
+}
+
+
+/* =========================================================
+AUTH
+========================================================= */
+
+async function submitAuth(){
+
+clearAuthMessage();
+
+
+const email =
+document
+.getElementById("authEmail")
+.value
+.trim();
+
+const password =
+document
+.getElementById("authPassword")
+.value;
+
+
+if(!email){
+
+return showAuthMessage(
+"Please enter your email address.",
+"error"
+);
+
+}
+
+
+if(
+!password ||
+password.length<6
+){
+
+return showAuthMessage(
+"Password must contain at least 6 characters.",
+"error"
+);
+
+}
+
+
+if(authMode==="signup"){
+
+const name =
+document
+.getElementById("authName")
+.value
+.trim();
+
+
+const confirm =
+document
+.getElementById(
+"authConfirmPassword"
+)
+.value;
+
+
+if(!name){
+
+return showAuthMessage(
+"Please enter your name.",
+"error"
+);
+
+}
+
+
+if(password!==confirm){
+
+return showAuthMessage(
+"Passwords do not match.",
+"error"
+);
+
+}
+
+
+showAuthMessage(
+"Creating your account...",
+"success"
+);
+
+
+const {data,error} =
+await supabaseClient.auth.signUp({
+
+email:email,
+
+password:password,
+
+options:{
+data:{
+full_name:name
+},
+
+emailRedirectTo:
+window.location.origin+
+window.location.pathname
+
+}
+
+});
+
+
+if(error){
+
+return showAuthMessage(
+error.message,
+"error"
+);
+
+}
+
+
+if(
+data.user &&
+!data.session
+){
+
+showAuthMessage(
+"Account created! Check your email and confirm your account before signing in.",
+"success"
+);
+
+return;
+
+}
+
+
+showAuthMessage(
+"Account created successfully.",
+"success"
+);
+
+
+setTimeout(
+checkSession,
+800
+);
+
+
+return;
+
+}
+
+
+/* SIGN IN */
+
+showAuthMessage(
+"Signing you in...",
+"success"
+);
+
+
+const {data,error} =
+await supabaseClient.auth.signInWithPassword({
+
+email:email,
+password:password
+
+});
+
+
+if(error){
+
+return showAuthMessage(
+error.message,
+"error"
+);
+
+}
+
+
+if(data.user){
+
+showAuthMessage(
+"Signed in successfully.",
+"success"
+);
+
+
+setTimeout(
+()=>{
+renderAccount(
+data.user
+);
+loadPremiumStatus();
+},
+500
+);
+
+}
+
+}
+
+
+/* =========================================================
+PASSWORD RESET
+========================================================= */
+
+async function forgotPassword(){
+
+const email =
+document
+.getElementById("authEmail")
+.value
+.trim();
+
+
+if(!email){
+
+return showAuthMessage(
+"Enter your email address first.",
+"error"
+);
+
+}
+
+
+const {error} =
+await supabaseClient.auth.resetPasswordForEmail(
+email,
+{
+redirectTo:
+window.location.origin+
+window.location.pathname
+}
+);
+
+
+if(error){
+
+return showAuthMessage(
+error.message,
+"error"
+);
+
+}
+
+
+showAuthMessage(
+"Password reset instructions have been sent to your email.",
+"success"
+);
+
+}
+
+
+/* =========================================================
+SESSION
+========================================================= */
+
+async function checkSession(){
+
+const {data} =
+await supabaseClient.auth.getSession();
+
+
+if(
+data?.session?.user
+){
+
+renderAccount(
+data.session.user
+);
+
+}else{
+
+document
+.getElementById("authSection")
+.style.display="block";
+
+document
+.getElementById("accountSection")
+.classList.remove("show");
+
+}
+
+}
+
+
+/* =========================================================
+ACCOUNT DISPLAY
+========================================================= */
+
+function renderAccount(user){
+
+document
+.getElementById("authSection")
+.style.display="none";
+
+
+document
+.getElementById("accountSection")
+.classList.add("show");
+
+
+const name =
+user.user_metadata?.full_name ||
+user.email?.split("@")[0] ||
+"User";
+
+
+document
+.getElementById("accountName")
+.textContent=name;
+
+
+document
+.getElementById("accountEmail")
+.textContent=
+user.email||"";
+
+
+document
+.getElementById("settingsEmail")
+.textContent=
+user.email||"";
+
+
+document
+.getElementById("accountAvatar")
+.textContent=
+name.charAt(0).toUpperCase();
+
+
+applyTheme();
+
+loadPremiumStatus();
+
+}
+
+
+/* =========================================================
+REFRESH
+========================================================= */
+
+async function refreshSession(){
+
+const {data} =
+await supabaseClient.auth.getUser();
+
+
+if(data?.user){
+
+renderAccount(
+data.user
+);
+
+}else{
+
+showSignin();
+
+}
+
+}
+
+
+/* =========================================================
+LOGOUT
+========================================================= */
+
+async function logout(){
+
+const {error} =
+await supabaseClient.auth.signOut();
+
+
+if(error){
+
+alert(error.message);
+
+return;
+
+}
+
+
+quickToolsPremium=false;
+
+
+document
+.getElementById("accountSection")
+.classList.remove("show");
+
+
+document
+.getElementById("authSection")
+.style.display="block";
+
+
+showSignup();
+
+
+showAuthMessage(
+"You have been signed out.",
+"success"
+);
+
+}
+
+
+/* =========================================================
+GUEST
+========================================================= */
+
+function continueAsGuest(){
+
+closeAccount();
+
+}
+
+
+/* =========================================================
+SETTINGS
+========================================================= */
+
+function openSettings(){
+
+document
+.getElementById("settingsSection")
+.classList.remove("hidden");
+
+applyTheme();
+
+}
+
+
+function closeSettings(){
+
+document
+.getElementById("settingsSection")
+.classList.add("hidden");
+
+}
+
+
+/* =========================================================
+AUTH STATE
+========================================================= */
+
+supabaseClient.auth.onAuthStateChange(
+(event,session)=>{
+
+if(session?.user){
+
+renderAccount(
+session.user
+);
+
+}else{
+
+quickToolsPremium=false;
+
+}
+
+}
+);
+
+
+/* =========================================================
+START
+========================================================= */
+
+document.addEventListener(
+"DOMContentLoaded",
+async()=>{
+
+applyTheme();
+
+await checkSession();
+
+await verifyFlutterwaveReturn();
+
+await loadPremiumStatus();
+
+}
+);
+
+</script>
+
+</body>
+  </html>
