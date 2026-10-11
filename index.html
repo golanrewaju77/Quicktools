@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="description" content="QuickTools - free everyday calculators, converters, text tools and generators.">
+<meta name="theme-color" content="#6d5dfc">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<link rel="manifest" href="manifest.json">
+<title>QuickTools - Free Online Tools</title>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+:root{--bg:#f5f7fb;--card:#fff;--text:#171923;--muted:#687083;--primary:#6d5dfc;--border:#e4e7ef;--input:#f8f9fc}
+body.dark{--bg:#0e1020;--card:#171a2c;--text:#f5f7ff;--muted:#aeb4c7;--border:#2a2e45;--input:#101324}
+*{box-sizing:border-box}body{margin:0;font-family:Arial,Helvetica,sans-serif;background:var(--bg);color:var(--text);line-height:1.5}button,input,select,textarea{font:inherit}button{cursor:pointer}a{color:inherit;text-decoration:none}
+header{position:sticky;top:0;z-index:10;background:var(--card);border-bottom:1px solid var(--border)}.nav{max-width:1150px;margin:auto;padding:12px 18px;display:flex;justify-content:space-between;align-items:center;gap:12px}.logo{font-weight:800;font-size:22px;color:var(--primary)}.nav-actions{display:flex;gap:8px;align-items:center}.btn,button{border:0;border-radius:10px;padding:10px 14px}.primary{background:var(--primary);color:white}.secondary{background:var(--input);color:var(--text);border:1px solid var(--border)}main{max-width:1150px;margin:auto;padding:22px 18px 50px}.hero{text-align:center;padding:36px 10px}.hero h1{font-size:clamp(32px,6vw,52px);margin:0 0 10px}.hero h1 span{color:var(--primary)}.hero p{color:var(--muted);max-width:650px;margin:auto}.search{display:block;width:min(700px,100%);margin:24px auto 0;padding:14px;border:1px solid var(--border);border-radius:12px;background:var(--card);color:var(--text)}.categories{display:flex;flex-wrap:wrap;justify-content:center;gap:8px;margin:18px 0 28px}.category{background:var(--card);border:1px solid var(--border);color:var(--text)}.category.active{background:var(--primary);color:white}.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:14px}.tool{background:var(--card);border:1px solid var(--border);border-radius:15px;padding:18px;box-shadow:0 5px 20px #00000008}.tool h3{margin:0 0 7px}.tool p{color:var(--muted);font-size:14px;min-height:40px}.tool button{width:100%;background:var(--primary);color:#fff}.panel{margin-top:28px;padding:20px;border:1px solid var(--border);border-radius:16px;background:var(--card)}.plans{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:12px;margin-top:15px}.plan{padding:16px;border:1px solid var(--border);border-radius:12px}.plan strong{font-size:24px;display:block}.plan small{display:block;color:var(--muted);margin:4px 0 12px}.field{display:block;width:100%;padding:11px;margin:8px 0 12px;border:1px solid var(--border);border-radius:9px;background:var(--input);color:var(--text)}.result{padding:12px;background:var(--input);border-radius:10px;margin-top:12px;overflow-wrap:anywhere}.muted{color:var(--muted)}footer{border-top:1px solid var(--border);padding:25px 18px;text-align:center;color:var(--muted)}.footer-links{display:flex;justify-content:center;gap:16px;flex-wrap:wrap;margin-bottom:10px}.modal{position:fixed;inset:0;z-index:100;background:#0009;display:none;align-items:center;justify-content:center;padding:15px;overflow:auto}.modal.show{display:flex}.modal-card{width:min(480px,100%);max-height:95vh;overflow:auto;background:var(--card);color:var(--text);border-radius:16px;padding:22px}.modal-top{display:flex;justify-content:space-between;align-items:center}.modal-top h2{margin:0}.close{background:transparent;color:var(--text);font-size:25px;padding:0 8px}.message{font-size:14px;margin:8px 0}.message.error{color:#e5484d}.message.success{color:#16a34a}body.auth-required main,body.auth-required footer{display:none!important}body.auth-required #accountModal{display:flex!important}body.auth-required #accountModal .close{display:none!important}
+@media(max-width:600px){.nav{padding:10px}.nav-actions .nav-btn{display:none}.hero{padding-top:25px}.grid{grid-template-columns:1fr}}
+</style>
+</head>
+<body class="auth-required">
+<header><div class="nav">
+<a class="logo" href="index.html">⚡ QuickTools</a>
+<div class="nav-actions">
+<button class="secondary nav-btn" onclick="document.getElementById('tools').scrollIntoView({behavior:'smooth'})">Tools</button>
+<button class="secondary" onclick="toggleTheme()" aria-label="Toggle theme">🌙</button>
+<button class="primary" onclick="openAccount()">Account</button>
+</div></div></header>
+<main>
+<section class="hero"><h1>Useful Tools. <span>All in One Place.</span></h1><p>Free, fast and simple online tools for calculations, conversions, text processing and everyday tasks.</p><input class="search" id="search" placeholder="Search tools..." oninput="filterTools()"></section>
+<div class="categories">
+<button class="category active" onclick="setCategory('All',this)">All</button>
+<button class="category" onclick="setCategory('Calculators',this)">Calculators</button>
+<button class="category" onclick="setCategory('Text',this)">Text</button>
+<button class="category" onclick="setCategory('Converters',this)">Converters</button>
+<button class="category" onclick="setCategory('Generators',this)">Generators</button>
+<button class="category" onclick="setCategory('Date & Time',this)">Date &amp; Time</button>
+</div>
+<section id="tools" class="grid">
+<div class="tool" data-category="Calculators" data-name="Calculator"><h3>Calculator</h3><p>Perform everyday arithmetic.</p><button onclick="openTool('calculator')">Open tool</button></div>
+<div class="tool" data-category="Calculators" data-name="Percentage Calculator"><h3>Percentage Calculator</h3><p>Find percentages and percentage change.</p><button onclick="openTool('percentage')">Open tool</button></div>
+<div class="tool" data-category="Calculators" data-name="Age Calculator"><h3>Age Calculator</h3><p>Calculate your age from your birth date.</p><button onclick="openTool('age')">Open tool</button></div>
+<div class="tool" data-category="Calculators" data-name="BMI Calculator"><h3>BMI Calculator</h3><p>Estimate body mass index from height and weight.</p><button onclick="openTool('bmi')">Open tool</button></div>
+<div class="tool" data-category="Calculators" data-name="Loan Calculator"><h3>Loan Calculator</h3><p>Estimate monthly loan repayments.</p><button onclick="openTool('loan')">Open tool</button></div>
+<div class="tool" data-category="Calculators" data-name="Discount Calculator"><h3>Discount Calculator</h3><p>Calculate the discounted price.</p><button onclick="openTool('discount')">Open tool</button></div>
+<div class="tool" data-category="Calculators" data-name="Compound Interest"><h3>Compound Interest</h3><p>Estimate growth with compound interest.</p><button onclick="openTool('compound')">Open tool</button></div>
+<div class="tool" data-category="Calculators" data-name="Tip and Bill Splitter"><h3>Tip &amp; Bill Splitter</h3><p>Split a bill fairly between people.</p><button onclick="openTool('split')">Open tool</button></div>
+<div class="tool" data-category="Text" data-name="Text Analyzer"><h3>Text Analyzer</h3><p>Count words, characters and sentences.</p><button onclick="openTool('text')">Open tool</button></div>
+<div class="tool" data-category="Text" data-name="Case Converter"><h3>Case Converter</h3><p>Change text to upper or lower case.</p><button onclick="openTool('case')">Open tool</button></div>
+<div class="tool" data-category="Text" data-name="Remove Duplicate Lines"><h3>Remove Duplicate Lines</h3><p>Remove repeated lines from text.</p><button onclick="openTool('duplicates')">Open tool</button></div>
+<div class="tool" data-category="Converters" data-name="Unit Converter"><h3>Unit Converter</h3><p>Convert common length, weight and temperature units.</p><button onclick="openTool('units')">Open tool</button></div>
+<div class="tool" data-category="Generators" data-name="Password Generator"><h3>Password Generator</h3><p>Create a random password in your browser.</p><button onclick="openTool('password')">Open tool</button></div>
+<div class="tool" data-category="Generators" data-name="Random Number"><h3>Random Number</h3><p>Generate a random number within a range.</p><button onclick="openTool('random')">Open tool</button></div>
+<div class="tool" data-category="Date & Time" data-name="Date Difference"><h3>Date Difference</h3><p>Find the days between two dates.</p><button onclick="openTool('datediff')">Open tool</button></div>
+<div class="tool" data-category="Calculators" data-name="GPA Calculator"><h3>GPA Calculator</h3><p>Calculate a weighted grade point average.</p><button onclick="openTool('gpa')">Open tool</button></div>
+</section>
+<section class="panel" id="premium"><h2>⚡ QuickTools Premium</h2><p class="muted">Upgrade through Paystack to unlock Premium access. Sign in before purchasing.</p>
+<div id="premiumStatus" class="result">Sign in to check your Premium status.</div>
+<div class="plans">
+<div class="plan"><strong>₦2,500</strong><small>Monthly · 30 days</small><button class="primary" onclick="buyPremium('monthly')">Get Monthly</button></div>
+<div class="plan"><strong>₦20,000</strong><small>Yearly · 365 days</small><button class="primary" onclick="buyPremium('yearly')">Get Yearly</button></div>
+<div class="plan"><strong>₦50,000</strong><small>Lifetime</small><button class="primary" onclick="buyPremium('lifetime')">Get Lifetime</button></div>
+</div></section>
+<section class="panel" id="toolPanel" hidden><div class="modal-top"><h2 id="toolTitle">Tool</h2><button class="secondary" onclick="closeTool()">Close</button></div><div id="toolBody"></div></section>
+</main>
+<footer><div class="footer-links"><a href="About.html">About</a><a href="Privacy.html">Privacy</a><a href="Terms.html">Terms</a><a href="Contact.html">Contact</a><a href="admin.html">Admin</a></div><div>© <span id="year"></span> QuickTools. All rights reserved.</div></footer>
+<div class="modal show" id="accountModal" role="dialog" aria-modal="true" aria-labelledby="authTitle"><div class="modal-card">
+<div class="modal-top"><h2 id="authTitle">Create your account</h2><button class="close" onclick="closeAccount()" aria-label="Close">×</button></div>
+<p class="muted" id="authSubtitle">Sign up with your email address.</p>
+<div id="authSection">
+<div style="display:flex;gap:8px;margin-top:12px"><button id="signupTab" class="primary" onclick="showSignup()">Sign up</button><button id="signinTab" class="secondary" onclick="showSignin()">Sign in</button></div>
+<div id="nameWrap"><label for="authName">Name</label><input class="field" id="authName" autocomplete="name" placeholder="Your name"></div>
+<label for="authEmail">Email</label><input class="field" id="authEmail" type="email" autocomplete="email" placeholder="you@example.com">
+<label for="authPassword">Password</label><input class="field" id="authPassword" type="password" autocomplete="current-password" placeholder="At least 6 characters">
+<div id="confirmWrap"><label for="authConfirm">Confirm password</label><input class="field" id="authConfirm" type="password" autocomplete="new-password" placeholder="Repeat password"></div>
+<button class="primary" style="width:100%" id="authSubmit" onclick="submitAuth()">Create account</button>
+<button class="secondary" style="width:100%;margin-top:8px" onclick="resetPassword()">Forgot password?</button>
+<div id="authMessage" class="message" aria-live="polite"></div>
+<p class="muted" style="font-size:12px">Email confirmation may be required before you can sign in.</p>
+</div>
+<div id="accountSection" hidden><p id="accountEmail"></p><p id="accountMessage" class="muted"></p><button class="secondary" onclick="signOut()">Sign out</button></div>
+</div></div>
+<script>
+const SUPABASE_URL="https://vabrpwyjsowbgzoktxvy.supabase.co";
+const SUPABASE_KEY="sb_publishable_AJ5Wbwx4q2yAkaaZUl-bvg_dTDNYDbP";
+const supabaseClient=window.supabase.createClient(SUPABASE_URL,SUPABASE_KEY);
+let authMode="signup", currentCategory="All", quickToolsPremium=false;
+const $=id=>document.getElementById(id);
+function lockApp(){document.body.classList.add("auth-required");$("accountModal").classList.add("show")}
+function unlockApp(){document.body.classList.remove("auth-required");$("accountModal").classList.remove("show")}
+function openAccount(){$("accountModal").classList.add("show")}
+function closeAccount(){if(document.body.classList.contains("auth-required"))return;$("accountModal").classList.remove("show")}
+function showMessage(message,type=""){const el=$("authMessage");el.textContent=message;el.className="message "+type}
+function showSignup(){authMode="signup";$("authTitle").textContent="Create your account";$("authSubtitle").textContent="Sign up with your email address.";$("nameWrap").hidden=false;$("confirmWrap").hidden=false;$("authSubmit").textContent="Create account";$("signupTab").className="primary";$("signinTab").className="secondary";showMessage("")}
+function showSignin(){authMode="signin";$("authTitle").textContent="Welcome back";$("authSubtitle").textContent="Sign in to your QuickTools account.";$("nameWrap").hidden=true;$("confirmWrap").hidden=true;$("authSubmit").textContent="Sign in";$("signupTab").className="secondary";$("signinTab").className="primary";showMessage("")}
+async function submitAuth(){
+ const email=$("authEmail").value.trim(), password=$("authPassword").value;
+ if(!email)return showMessage("Enter your email address.","error");
+ if(password.length<6)return showMessage("Password must be at least 6 characters.","error");
+ try{
+  if(authMode==="signup"){
+   const name=$("authName").value.trim();
+   if(!name)return showMessage("Enter your name.","error");
+   if(password!==$("authConfirm").value)return showMessage("Passwords do not match.","error");
+   showMessage("Creating account...");
+   const {data,error}=await supabaseClient.auth.signUp({email,password,options:{data:{full_name:name},emailRedirectTo:window.location.origin+window.location.pathname}});
+   if(error)throw error;
+   if(data.session){unlockApp();await checkSession()}else showMessage("Account created. Check your email for the confirmation link.","success");
+  }else{
+   showMessage("Signing in...");
+   const {data,error}=await supabaseClient.auth.signInWithPassword({email,password});
+   if(error)throw error;
+   if(data.session){unlockApp();await checkSession()}
+  }
+ }catch(e){showMessage(e.message||"Authentication failed.","error")}
+}
+async function resetPassword(){const email=$("authEmail").value.trim();if(!email)return showMessage("Enter your email first.","error");const {error}=await supabaseClient.auth.resetPasswordForEmail(email,{redirectTo:window.location.origin+window.location.pathname});showMessage(error?error.message:"If the address is registered, a password reset email will be sent.",error?"error":"success")}
+async function signOut(){await supabaseClient.auth.signOut();quickToolsPremium=false;lockApp();showSignup();$("accountSection").hidden=true;$("authSection").hidden=false}
+async function checkSession(){const {data}=await supabaseClient.auth.getSession();if(data.session?.user){unlockApp();$("authSection").hidden=true;$("accountSection").hidden=false;$("accountEmail").textContent=data.session.user.email||"";$("accountMessage").textContent="You are signed in.";await loadPremiumStatus()}else{lockApp();$("authSection").hidden=false;$("accountSection").hidden=true}}
+supabaseClient.auth.onAuthStateChange((event,session)=>{if(session?.user){unlockApp();$("authSection").hidden=true;$("accountSection").hidden=false;$("accountEmail").textContent=session.user.email||"";loadPremiumStatus()}else{quickToolsPremium=false;lockApp()}});
+async function loadPremiumStatus(){const el=$("premiumStatus");try{const {data,error}=await supabaseClient.functions.invoke("quicktools-payments",{body:{action:"status"}});if(error)throw error;quickToolsPremium=!!(data?.plan&&data.plan!=="free"&&data.status==="active");el.textContent=quickToolsPremium?"Premium active: "+String(data.plan).toUpperCase():"Free plan active. Upgrade to unlock Premium features."}catch(e){el.textContent="Premium status could not be checked. Please try again."}}
+async function buyPremium(plan){const {data:sd}=await supabaseClient.auth.getSession();if(!sd?.session){openAccount();showSignin();showMessage("Sign in before purchasing Premium.","error");return}const labels={monthly:"₦2,500/month",yearly:"₦20,000/year",lifetime:"₦50,000 lifetime"};if(!confirm("Continue to Paystack checkout for "+labels[plan]+"?"))return;try{const {data,error}=await supabaseClient.functions.invoke("quicktools-payments",{body:{action:"initiate",plan}});if(error)throw error;if(!data?.checkout_url)throw new Error(data?.error||"Could not start checkout.");window.location.href=data.checkout_url}catch(e){alert(e.message||"Payment could not be started.")}}
+async function verifyPaystackReturn(){const p=new URLSearchParams(location.search),reference=p.get("reference")||p.get("trxref");if(!reference)return;const {data:sd}=await supabaseClient.auth.getSession();if(!sd?.session){lockApp();showSignin();showMessage("Sign in to verify your payment.","error");return}try{const {data,error}=await supabaseClient.functions.invoke("quicktools-payments",{body:{action:"verify",reference}});if(error)throw error;if(!data?.success)throw new Error(data?.error||"Payment verification failed.");history.replaceState({},document.title,location.pathname);alert("Payment verified. Premium status is refreshed.");await loadPremiumStatus()}catch(e){alert(e.message||"Payment verification failed.")}}
+function toggleTheme(){document.body.classList.toggle("dark");localStorage.setItem("qt-theme",document.body.classList.contains("dark")?"dark":"light")}
+function setCategory(category,button){currentCategory=category;document.querySelectorAll(".category").forEach(x=>x.classList.remove("active"));button.classList.add("active");filterTools()}
+function filterTools(){const q=$("search").value.toLowerCase();document.querySelectorAll(".tool").forEach(t=>{t.hidden=!(currentCategory==="All"||t.dataset.category===currentCategory)||!t.dataset.name.toLowerCase().includes(q)})}
+function field(label,id,type="number",placeholder=""){return `<label>${label}<input class="field" id="${id}" type="${type}" placeholder="${placeholder}"></label>`}
+function output(text){return `<div class="result" id="toolResult">${text}</div>`}
+function openTool(name){const panel=$("toolPanel"),body=$("toolBody");panel.hidden=false;panel.scrollIntoView({behavior:"smooth"});const titles={calculator:"Calculator",percentage:"Percentage Calculator",age:"Age Calculator",bmi:"BMI Calculator",loan:"Loan Calculator",discount:"Discount Calculator",compound:"Compound Interest",split:"Tip & Bill Splitter",text:"Text Analyzer",case:"Case Converter",duplicates:"Remove Duplicate Lines",units:"Unit Converter",password:"Password Generator",random:"Random Number",datediff:"Date Difference",gpa:"GPA Calculator"};$("toolTitle").textContent=titles[name]||"Tool";const run=(label,fn)=>`<button class="primary" onclick="${fn}">${label}</button>`;
+ const forms={
+ calculator:`${field("Expression (example: 12*(4+3))","expr","text","12*(4+3)")}${run("Calculate","calcExpression()")}${output("")}`,
+ percentage:`${field("Number","pctNumber")}${field("Percentage (%)","pctValue")}${run("Calculate","calcPercentage()")}${output("")}`,
+ age:`${field("Date of birth","birthDate","date")}${run("Calculate age","calcAge()")}${output("")}`,
+ bmi:`${field("Weight (kg)","weight")}${field("Height (cm)","height")}${run("Calculate BMI","calcBMI()")}${output("")}`,
+ loan:`${field("Loan amount (₦)","loanAmount")}${field("Annual interest rate (%)","loanRate")}${field("Term (years)","loanYears")}${run("Calculate repayment","calcLoan()")}${output("")}`,
+ discount:`${field("Original price (₦)","price")}${field("Discount (%)","discountRate")}${run("Calculate price","calcDiscount()")}${output("")}`,
+ compound:`${field("Initial amount (₦)","principal")}${field("Annual interest rate (%)","interestRate")}${field("Years","years")}${field("Compounds per year","frequency")}${run("Calculate","calcCompound()")}${output("")}`,
+ split:`${field("Bill amount (₦)","bill")}${field("Tip (%)","tip")}${field("Number of people","people")}${run("Split bill","calcSplit()")}${output("")}`,
+ text:`<label>Enter text<textarea class="field" id="textInput" rows="5"></textarea></label>${run("Analyze text","analyzeText()")}${output("")}`,
+ case:`<label>Enter text<textarea class="field" id="caseInput" rows="4"></textarea></label><button class="secondary" onclick="convertCase('upper')">UPPERCASE</button> <button class="secondary" onclick="convertCase('lower')">lowercase</button> <button class="secondary" onclick="convertCase('title')">Title Case</button>${output("")}`,
+ duplicates:`<label>Enter lines<textarea class="field" id="dupInput" rows="5"></textarea></label>${run("Remove duplicates","removeDuplicates()")}${output("")}`,
+ units:`${field("Value","unitValue") }<label>Convert<select class="field" id="unitType"><option value="km-mi">Kilometres to miles</option><option value="mi-km">Miles to kilometres</option><option value="kg-lb">Kilograms to pounds</option><option value="lb-kg">Pounds to kilograms</option><option value="c-f">Celsius to Fahrenheit</option><option value="f-c">Fahrenheit to Celsius</option></select></label>${run("Convert","convertUnits()")}${output("")}`,
+ password:`${field("Password length (8–64)","passLength")}${run("Generate password","makePassword()")}${output("")}`,
+ random:`${field("Minimum","randMin")}${field("Maximum","randMax")}${run("Generate","makeRandom()")}${output("")}`,
+ datediff:`${field("Start date","dateA","date")}${field("End date","dateB","date")}${run("Calculate days","calcDateDiff()")}${output("")}`,
+ gpa:`${field("Grade points (comma-separated)","grades","text","5,4,3,5")}${field("Course units (comma-separated)","credits","text","3,3,2,3")}${run("Calculate GPA","calcGPA()")}${output("")}`
+ };
+ body.innerHTML=forms[name]||"Tool unavailable";}
+function closeTool(){$("toolPanel").hidden=true}
+function setResult(v){const e=$("toolResult");if(e)e.textContent=v}
+function calcExpression(){const s=$("expr").value.trim();if(!/^[0-9+\-*/().%\s]+$/.test(s))return setResult("Use numbers and arithmetic operators only.");try{const n=Function('"use strict";return ('+s.replace(/%/g,"/100")+')')();setResult(Number.isFinite(n)?String(n):"Invalid expression")}catch(e){setResult("Invalid expression")}}
+function calcPercentage(){const n=+$("pctNumber").value,p=+$("pctValue").value;setResult((p/100*n).toLocaleString()+" ("+p+"% of "+n+")")}
+function calcAge(){const d=new Date($("birthDate").value),now=new Date();if(!Number.isFinite(d.getTime())||d>now)return setResult("Enter a valid date of birth.");let y=now.getFullYear()-d.getFullYear(),m=now.getMonth()-d.getMonth();if(now.getDate()<d.getDate())m--;if(m<0){y--;m+=12}setResult(y+" years and "+m+" months")}
+function calcBMI(){const w=+$("weight").value,h=+$("height").value/100;if(w<=0||h<=0)return setResult("Enter a valid weight and height.");const bmi=w/(h*h);setResult("BMI: "+bmi.toFixed(1)+" (BMI is a screening measure, not a diagnosis.)")}
+function calcLoan(){const p=+$("loanAmount").value,r=+$("loanRate").value/1200,n=+$("loanYears").value*12;if(p<=0||n<=0)return setResult("Enter valid loan amount and term.");const m=r===0?p/n:p*r/(1-Math.pow(1+r,-n));setResult("Estimated monthly payment: ₦"+m.toLocaleString("en-NG",{maximumFractionDigits:2}))}
+function calcDiscount(){const p=+$("price").value,d=+$("discountRate").value;setResult("Final price: ₦"+(p*(1-d/100)).toLocaleString("en-NG",{maximumFractionDigits:2})+" · You save ₦"+(p*d/100).toLocaleString("en-NG",{maximumFractionDigits:2}))}
+function calcCompound(){const p=+$("principal").value,r=+$("interestRate").value/100,y=+$("years").value,n=Math.max(1,+$("frequency").value||1);const total=p*Math.pow(1+r/n,n*y);setResult("Estimated total: ₦"+total.toLocaleString("en-NG",{maximumFractionDigits:2})+" · Interest: ₦"+(total-p).toLocaleString("en-NG",{maximumFractionDigits:2}))}
+function calcSplit(){const b=+$("bill").value,t=+$("tip").value,people=+$("people").value;if(people<1)return setResult("Enter at least one person.");const total=b*(1+t/100);setResult("Total with tip: ₦"+total.toFixed(2)+" · Per person: ₦"+(total/people).toFixed(2))}
+function analyzeText(){const s=$("textInput").value;setResult("Words: "+(s.trim()?s.trim().split(/\s+/).length:0)+" · Characters: "+s.length+" · Sentences: "+(s.match(/[.!?]+/g)||[]).length)}
+function convertCase(mode){const s=$("caseInput").value;setResult(mode==="upper"?s.toUpperCase():mode==="lower"?s.toLowerCase():s.toLowerCase().replace(/\b\w/g,c=>c.toUpperCase()))}
+function removeDuplicates(){setResult([...new Set($("dupInput").value.split(/\r?\n/))].join("\n"))}
+function convertUnits(){const v=+$("unitValue").value,t=$("unitType").value,fn={"km-mi":v=>v*.621371,"mi-km":v=>v/ .621371,"kg-lb":v=>v*2.20462,"lb-kg":v=>v/2.20462,"c-f":v=>v*9/5+32,"f-c":v=>(v-32)*5/9}[t];setResult(fn(v).toLocaleString(undefined,{maximumFractionDigits:4}))}
+function makePassword(){let n=Math.max(8,Math.min(64,+$("passLength").value||16)),chars="ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz23456789!@#$%&*_-";let a=new Uint32Array(n);crypto.getRandomValues(a);setResult(Array.from(a,x=>chars[x%chars.length]).join(""))}
+function makeRandom(){let a=+$("randMin").value,b=+$("randMax").value;if(b<a)return setResult("Maximum must be greater than or equal to minimum.");setResult(String(Math.floor(Math.random()*(b-a+1))+a))}
+function calcDateDiff(){const a=new Date($("dateA").value),b=new Date($("dateB").value);if(!Number.isFinite(a.getTime())||!Number.isFinite(b.getTime()))return setResult("Choose both dates.");setResult(Math.abs(Math.round((b-a)/86400000))+" days")}
+function calcGPA(){const g=$("grades").value.split(",").map(Number),c=$("credits").value.split(",").map(Number);if(!g.length||g.length!==c.length||g.some(x=>!Number.isFinite(x))||c.some(x=>!Number.isFinite(x)||x<=0))return setResult("Enter matching grade points and positive course units, separated by commas.");setResult("Weighted GPA: "+(g.reduce((s,x,i)=>s+x*c[i],0)/c.reduce((s,x)=>s+x,0)).toFixed(2))}
+$("year").textContent=new Date().getFullYear();
+if(localStorage.getItem("qt-theme")==="dark")document.body.classList.add("dark");
+document.addEventListener("DOMContentLoaded",async()=>{await checkSession();await verifyPaystackReturn()});
+</script>
+</body>
+</html>
